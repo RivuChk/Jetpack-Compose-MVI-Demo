@@ -12,10 +12,10 @@ import org.koin.dsl.module
 
 val dataModule = module {
 
-//    single { MovieApiFactory.makeMovieApi() }
-//
-//    single<MovieDataStore>(named("local")) { LocalMovieDataStore() }
-//    single<MovieDataStore>(named("remote")) { RemoteMovieDataStore(get()) }
-//
-//    single<IMovieRepository> { MovieRepository(get(named("local")), get(named("remote"))) }
+    single { MovieApiFactory.makeMovieApi() }
+
+    single<MovieDataStore>(named("local")) { LocalMovieDataStore() }
+    single<MovieDataStore>(named("remote")) { RemoteMovieDataStore(get()) }
+
+    single<IMovieRepository> { MovieRepository(get(named("local")), get(named("remote"))) }
 }

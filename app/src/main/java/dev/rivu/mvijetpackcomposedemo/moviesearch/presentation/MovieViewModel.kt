@@ -1,11 +1,15 @@
 package dev.rivu.mvijetpackcomposedemo.moviesearch.presentation
 
 import dev.rivu.mvijetpackcomposedemo.base.presentation.BaseViewModel
+import dev.rivu.mvijetpackcomposedemo.base.presentation.ISchedulerProvider
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableTransformer
 import io.reactivex.rxjava3.functions.BiFunction
 
-class MovieViewModel(override val actionProcessor: MovieProcessor) :
+class MovieViewModel(
+    override val actionProcessor: MovieProcessor,
+    override val schedulerProvider: ISchedulerProvider
+) :
     BaseViewModel<MovieIntent, MoviesState, MovieAction, MovieResult>() {
 
     override fun intentFilter(): FlowableTransformer<MovieIntent, MovieIntent> {
