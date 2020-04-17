@@ -9,10 +9,14 @@ import java.lang.Exception
 data class MoviesState(
     val query: String = emptyString(),
     val movies: List<Movie> = listOf(),
-    val error: Exception? = null,
+    val error: Throwable? = null,
     val isLoading: Boolean = false,
     val detail: MovieDetail? = null
-) : MviState
+) : MviState {
+    companion object {
+        fun initialState(): MoviesState = MoviesState()
+    }
+}
 
 fun MoviesState.isIdleState() =
     query.isBlank() && movies.isEmpty() && error == null && !isLoading && detail == null

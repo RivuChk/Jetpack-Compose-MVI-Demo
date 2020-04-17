@@ -45,7 +45,8 @@ class MovieRepository(
         return localDataStore.addMovies(movieList)
     }
 
-    override fun getMovieDetail(imdbId: String): Single<MovieDetail> {
+    override fun getMovieDetail(imdbId: String): Flowable<MovieDetail> {
         return remoteDataStore.getMovieDetail(imdbId)
+            .toFlowable()
     }
 }
