@@ -7,8 +7,10 @@ import androidx.ui.core.setContent
 import androidx.ui.material.MaterialTheme
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MovieIntent
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MovieViewModel
+import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.isDetailState
 import dev.rivu.mvijetpackcomposedemo.moviesearch.ui.MoviesScreen
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.subjects.PublishSubject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -20,11 +22,15 @@ class MainActivity : AppCompatActivity() {
         moviesViewModel.states()
     }
 
+    val searchPublisher: PublishSubject<MovieIntent.SearchIntent> = PublishSubject.create()
+    val clickPublisher: PublishSubject<MovieIntent.ClickIntent> = PublishSubject.create()
+    val clearClickPublisher: PublishSubject<MovieIntent.ClearClickIntent> = PublishSubject.create()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
-                MoviesScreen(liveData)
+                MoviesScreen(this, liveData, ::search, ::click)
             }
         }
 
@@ -36,13 +42,33 @@ class MainActivity : AppCompatActivity() {
         moviesViewModel.processIntents(intents())
     }
 
-    fun intents(): Observable<MovieIntent> {
-        return Observable.defer {
-            Observable.just(
-                MovieIntent.InitialIntent,
-                MovieIntent.SearchIntent("John"),
-                MovieIntent.SearchIntent("Jack")
-            )
+    private fun search(query: String) {
+        searchPublisher.onNext(MovieIntent.SearchIntent(query))
+    }
+
+    private fun click(imdbId: String) {
+        clickPublisher.onNext(MovieIntent.ClickIntent(imdbId))
+    }
+
+    override fun onBackPressed() {
+        val state = liveData.value
+        if (state != null && state.isDetailState()) {
+            clearClickPublisher.onNext(MovieIntent.ClearClickIntent)
+        } else {
+            super.onBackPressed()
         }
+    }
+
+    fun intents(): Observable<MovieIntent> {
+        return Observable.merge(
+            Observable.defer {
+                Observable.just(
+                    MovieIntent.InitialIntent
+                )
+            },
+            searchPublisher.hide(),
+            clickPublisher.hide(),
+            clearClickPublisher.hide()
+        )
     }
 }

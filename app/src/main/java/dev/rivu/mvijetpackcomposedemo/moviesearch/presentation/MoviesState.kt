@@ -4,7 +4,6 @@ import dev.rivu.mvijetpackcomposedemo.base.MviState
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.MovieDetail
 import dev.rivu.mvijetpackcomposedemo.utils.emptyString
-import java.lang.Exception
 
 data class MoviesState(
     val query: String = emptyString(),
@@ -23,5 +22,7 @@ fun MoviesState.isIdleState() =
 
 fun MoviesState.isDetailState() =
     detail != null
+
+fun MoviesState.isLoading() = isLoading
 
 fun MoviesState.resetDetailState(): MoviesState = copy(detail = null)
