@@ -13,6 +13,9 @@ android {
     versionName "1.0"
 
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    buildConfigField("String", "ApiKey", "\"cd4ff600\"")
+    buildConfigField("String", "BASE_URL", "\"https://www.omdbapi.com/\"")
   }
 
   buildTypes {
@@ -58,4 +61,24 @@ dependencies {
   implementation "androidx.ui:ui-layout:$compose_version"
   implementation "androidx.ui:ui-material:$compose_version"
   implementation "androidx.ui:ui-livedata:$compose_version"
+
+  def koin_version = "2.1.5"
+  implementation "org.koin:koin-android:$koin_version"
+  implementation "org.koin:koin-androidx-scope:$koin_version"
+  implementation "org.koin:koin-androidx-viewmodel:$koin_version"
+  implementation "org.koin:koin-androidx-fragment:$koin_version"
+
+  //RxJava
+  implementation "io.reactivex.rxjava3:rxjava:3.0.2"
+  implementation "io.reactivex.rxjava3:rxandroid:3.0.0"
+  //implementation "com.github.akarnokd:rxjava3-bridge:3.0.0"
+
+  //Retrofit
+  implementation "com.squareup.retrofit2:retrofit:2.8.1"
+  implementation "com.squareup.okhttp3:logging-interceptor:4.5.0"
+  implementation "com.squareup.retrofit2:converter-gson:2.8.1"
+  implementation "com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0"
+
+  //Timber
+  implementation "com.jakewharton.timber:timber:4.7.1"
 }
