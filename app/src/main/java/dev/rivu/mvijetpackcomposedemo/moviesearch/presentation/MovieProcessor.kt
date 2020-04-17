@@ -1,11 +1,15 @@
 package dev.rivu.mvijetpackcomposedemo.moviesearch.presentation
 
+import dev.rivu.mvijetpackcomposedemo.base.presentation.ISchedulerProvider
 import dev.rivu.mvijetpackcomposedemo.base.presentation.MviActionProcessor
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.IMovieRepository
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableTransformer
 
-open class MovieProcessor(private val repository: IMovieRepository) :
+open class MovieProcessor(
+    private val repository: IMovieRepository,
+    override val schedulerProvider: ISchedulerProvider
+) :
     MviActionProcessor<MovieAction, MovieResult> {
     override fun transformFromAction(): FlowableTransformer<MovieAction, MovieResult> =
         FlowableTransformer { actionFlowable ->
@@ -37,6 +41,8 @@ open class MovieProcessor(private val repository: IMovieRepository) :
                             query = action.query
                         )
                     }
+                    .subscribeOn(schedulerProvider.io())
+                    .observeOn(schedulerProvider.ui())
                     .startWithItem(
                         MovieResult.SearchResult.InProgress(action.query)
                     )
@@ -60,6 +66,8 @@ open class MovieProcessor(private val repository: IMovieRepository) :
                             imdbId = action.imdbId
                         )
                     }
+                    .subscribeOn(schedulerProvider.io())
+                    .observeOn(schedulerProvider.ui())
                     .startWithItem(
                         MovieResult.LoadDetailResult.InProgress(action.imdbId)
                     )

@@ -17,8 +17,6 @@ abstract class BaseViewModel<I : MviIntent, S : MviState, A : MviAction, R : Mvi
 
     protected abstract val actionProcessor: MviActionProcessor<A, R>
 
-    protected abstract val schedulerProvider: ISchedulerProvider
-
     private val intentsSubject: PublishSubject<I> = PublishSubject.create()
     private val statesLiveData: LiveData<S> by lazy {
         LiveDataReactiveStreams.fromPublisher(statesObservable)
@@ -51,8 +49,6 @@ abstract class BaseViewModel<I : MviIntent, S : MviState, A : MviAction, R : Mvi
             .distinctUntilChanged()
             .replay(1)
             .autoConnect(0)
-            .subscribeOn(schedulerProvider.io())
-            .observeOn(schedulerProvider.ui())
     }
 
     abstract fun reducer(): BiFunction<S, R, S>

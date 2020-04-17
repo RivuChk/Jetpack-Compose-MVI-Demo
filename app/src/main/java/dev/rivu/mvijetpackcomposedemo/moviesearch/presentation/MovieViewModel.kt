@@ -7,8 +7,7 @@ import io.reactivex.rxjava3.core.FlowableTransformer
 import io.reactivex.rxjava3.functions.BiFunction
 
 class MovieViewModel(
-    override val actionProcessor: MovieProcessor,
-    override val schedulerProvider: ISchedulerProvider
+    override val actionProcessor: MovieProcessor
 ) :
     BaseViewModel<MovieIntent, MoviesState, MovieAction, MovieResult>() {
 

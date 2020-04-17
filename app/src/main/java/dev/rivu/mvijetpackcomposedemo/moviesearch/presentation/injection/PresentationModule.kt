@@ -11,7 +11,7 @@ val presentationModule = module {
 
     single<ISchedulerProvider> { SchedulerProvider() }
 
-    single { MovieProcessor(get()) }
-    viewModel { MovieViewModel(get(), get()) }
+    single { MovieProcessor(get(), get()) }
+    viewModel { MovieViewModel(get()) }
 
 }
