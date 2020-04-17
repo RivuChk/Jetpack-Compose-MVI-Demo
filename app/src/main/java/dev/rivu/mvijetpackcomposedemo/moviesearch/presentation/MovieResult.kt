@@ -1,8 +1,9 @@
 package dev.rivu.mvijetpackcomposedemo.moviesearch.presentation
 
+import dev.rivu.mvijetpackcomposedemo.base.MviResult
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
 
-sealed class MovieResult {
+sealed class MovieResult : MviResult {
     sealed class SearchResult : MovieResult() {
         abstract val query: String
 
