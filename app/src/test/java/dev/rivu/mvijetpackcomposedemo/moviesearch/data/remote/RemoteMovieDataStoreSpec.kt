@@ -1,7 +1,7 @@
 package dev.rivu.mvijetpackcomposedemo.moviesearch.data.remote
 
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.whenever
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.datafactory.dummyMovieDetail
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.datafactory.dummyMovieDetailResponse
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.datafactory.dummyMovieSearchResponse
@@ -20,7 +20,7 @@ class RemoteMovieDataStoreSpecTest : Spek({
     describe("#${RemoteMovieDataStore::getMoviesStream.name}") {
 
         it("should return Flowable.error with UnsupportedOperationException") {
-            val testObservable = remoteDataStore.getMoviesStream(anyString()).test()
+            val testObservable = remoteDataStore.getMoviesStream("").test()
             testObservable.assertError(UnsupportedOperationException::class.java)
         }
     }
@@ -32,7 +32,13 @@ class RemoteMovieDataStoreSpecTest : Spek({
             val error = Exception("some error")
 
             beforeEachGroup {
-                whenever(movieApi.searchMovies(query = anyString(), type = anyString()))
+                whenever(
+                    movieApi.searchMovies(
+                        query = anyString(),
+                        type = anyString(),
+                        apikey = anyString()
+                    )
+                )
                     .thenReturn(
                         Single.error(error)
                     )
