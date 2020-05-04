@@ -20,8 +20,8 @@ class RemoteMovieDataStoreSpecTest : Spek({
     describe("#${RemoteMovieDataStore::getMoviesStream.name}") {
 
         it("should return Flowable.error with UnsupportedOperationException") {
-            val testObservable = remoteDataStore.getMoviesStream("").test()
-            testObservable.assertError(UnsupportedOperationException::class.java)
+            val testObserver = remoteDataStore.getMoviesStream("").test()
+            testObserver.assertError(UnsupportedOperationException::class.java)
         }
     }
 
@@ -45,8 +45,8 @@ class RemoteMovieDataStoreSpecTest : Spek({
             }
 
             it("should return the same error, wrapped in Single") {
-                val testObservable = remoteDataStore.getMovies("").test()
-                testObservable.assertError(error)
+                val testObserver = remoteDataStore.getMovies("").test()
+                testObserver.assertError(error)
             }
         }
 
@@ -78,8 +78,8 @@ class RemoteMovieDataStoreSpecTest : Spek({
             }
 
             it("should return the same error, wrapped in Single") {
-                val testObservable = remoteDataStore.getMovies("").test()
-                testObservable.assertValue(dummyMovieList)
+                val testObserver = remoteDataStore.getMovies("").test()
+                testObserver.assertValue(dummyMovieList)
             }
         }
     }
@@ -87,8 +87,8 @@ class RemoteMovieDataStoreSpecTest : Spek({
     describe("#${RemoteMovieDataStore::addMovies.name}") {
 
         it("should return Completable.error with UnsupportedOperationException") {
-            val testObservable = remoteDataStore.addMovies(listOf()).test()
-            testObservable.assertError(UnsupportedOperationException::class.java)
+            val testObserver = remoteDataStore.addMovies(listOf()).test()
+            testObserver.assertError(UnsupportedOperationException::class.java)
         }
     }
 
@@ -106,8 +106,8 @@ class RemoteMovieDataStoreSpecTest : Spek({
             }
 
             it("should return the same error, wrapped in Single") {
-                val testObservable = remoteDataStore.getMovieDetail("").test()
-                testObservable.assertError(error)
+                val testObserver = remoteDataStore.getMovieDetail("").test()
+                testObserver.assertError(error)
             }
         }
 
@@ -125,8 +125,8 @@ class RemoteMovieDataStoreSpecTest : Spek({
             }
 
             it("should return the same error, wrapped in Single") {
-                val testObservable = remoteDataStore.getMovieDetail("").test()
-                testObservable.assertValue(dummyMovieDetail)
+                val testObserver = remoteDataStore.getMovieDetail("").test()
+                testObserver.assertValue(dummyMovieDetail)
             }
         }
     }
@@ -134,8 +134,8 @@ class RemoteMovieDataStoreSpecTest : Spek({
     describe("#${RemoteMovieDataStore::addMovieDetail.name}") {
 
         it("should return Completable.error with UnsupportedOperationException") {
-            val testObservable = remoteDataStore.addMovies(listOf()).test()
-            testObservable.assertError(UnsupportedOperationException::class.java)
+            val testObserver = remoteDataStore.addMovies(listOf()).test()
+            testObserver.assertError(UnsupportedOperationException::class.java)
         }
     }
 })
