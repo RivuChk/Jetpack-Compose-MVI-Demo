@@ -1,5 +1,6 @@
 package dev.rivu.mvijetpackcomposedemo.moviesearch.data.datafactory
 
+import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.MovieDetail
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.remote.model.MovieDetailResponse
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.remote.model.MovieSearchResponse
@@ -20,6 +21,18 @@ val dummyMovieSearchResponse: MovieSearchResponse
                 )
             }
     )
+
+val dummyMovieSearchList: List<Movie>
+    get() = (0..10).toList()
+        .map {
+            Movie(
+                imdbID = "$it",
+                title = "Title $it",
+                poster = "Poster $it",
+                type = "Type $it",
+                year = "${2000 - it}"
+            )
+        }
 
 val dummyMovieDetailResponse: MovieDetailResponse
     get() = MovieDetailResponse(
@@ -53,7 +66,10 @@ val dummyMovieDetailResponse: MovieDetailResponse
 val dummyMovieDetail: MovieDetail
     get() = MovieDetail(
         response = "",
-        actors = "Jesse Eisenberg, Rooney Mara, Bryan Barter, Dustin Fitzsimons".split(", ", ignoreCase = true),
+        actors = "Jesse Eisenberg, Rooney Mara, Bryan Barter, Dustin Fitzsimons".split(
+            ", ",
+            ignoreCase = true
+        ),
         awards = "Won 3 Oscars. Another 171 wins & 183 nominations.",
         boxOffice = "$96,400,000",
         country = "USA",
