@@ -4,7 +4,6 @@ import androidx.lifecycle.Observer
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import dev.rivu.mvijetpackcomposedemo.base.presentation.ISchedulerProvider
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.IMovieRepository
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.datafactory.dummyMovieDetail
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.datafactory.dummyMovieSearchList
