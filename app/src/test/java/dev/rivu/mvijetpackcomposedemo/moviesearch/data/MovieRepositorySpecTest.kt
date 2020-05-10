@@ -163,30 +163,71 @@ class MovieRepositorySpecTest : Spek({
 
     describe("#${MovieRepository::getMovieDetail.name}") {
 
-        /*As of now, movieDetail is fetched from remote only,
-        * we will do TDD later to fetch movieDetail from local
-        */
+        context("local and remote both emits data") {
 
-        context("remote returns data") {
-
-            val dummyData = dummyMovieDetail
+            val dummyLocalData = dummyMovieDetail
+            val dummyRemoteData = dummyMovieDetail
 
             beforeEachGroup {
+                whenever(localDataStore.getMovieDetail(anyString()))
+                    .thenReturn(Single.just(dummyLocalData))
                 whenever(remoteDataStore.getMovieDetail(anyString()))
-                    .thenReturn(Single.just(dummyData))
+                    .thenReturn(Single.just(dummyRemoteData))
+                whenever(localDataStore.addMovieDetail(dummyRemoteData))
+                    .thenReturn(Completable.complete())
             }
 
-            it("should return the same data") {
+            it("should emit both data and save remote data to db") {
                 val testObserver = movieRepository.getMovieDetail("").test()
-                testObserver.assertValue(dummyData)
+                testObserver.assertValues(dummyLocalData, dummyRemoteData)
+                verify(localDataStore, atLeastOnce()).addMovieDetail(dummyRemoteData)
             }
         }
 
-        context("remote returns error") {
+        context("local emits error and remote emits data") {
+
+            val dummyRemoteData = dummyMovieDetail
+
+            beforeEachGroup {
+                whenever(localDataStore.getMovieDetail(anyString()))
+                    .thenReturn(Single.error(Exception("Some error")))
+                whenever(remoteDataStore.getMovieDetail(anyString()))
+                    .thenReturn(Single.just(dummyRemoteData))
+                whenever(localDataStore.addMovieDetail(dummyRemoteData))
+                    .thenReturn(Completable.complete())
+            }
+
+            it("should emit remote data and save to db") {
+                val testObserver = movieRepository.getMovieDetail("").test()
+                testObserver.assertValue(dummyRemoteData)
+                verify(localDataStore, atLeastOnce()).addMovieDetail(dummyRemoteData)
+            }
+        }
+
+        context("local emits data and remote emits error") {
+
+            val dummyLocalData = dummyMovieDetail
+
+            beforeEachGroup {
+                whenever(localDataStore.getMovieDetail(anyString()))
+                    .thenReturn(Single.just(dummyLocalData))
+                whenever(remoteDataStore.getMovieDetail(anyString()))
+                    .thenReturn(Single.error(Exception("Some error")))
+            }
+
+            it("should emit local data") {
+                val testObserver = movieRepository.getMovieDetail("").test()
+                testObserver.assertValue(dummyLocalData)
+            }
+        }
+
+        context("remote and local both emits error") {
 
             val error = Exception("Some error")
 
             beforeEachGroup {
+                whenever(localDataStore.getMovieDetail(anyString()))
+                    .thenReturn(Single.error(error))
                 whenever(remoteDataStore.getMovieDetail(anyString()))
                     .thenReturn(Single.error(error))
             }
