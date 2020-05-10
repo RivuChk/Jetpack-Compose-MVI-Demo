@@ -46,7 +46,25 @@ class MovieRepository(
     }
 
     override fun getMovieDetail(imdbId: String): Flowable<MovieDetail> {
-        return remoteDataStore.getMovieDetail(imdbId)
-            .toFlowable()
+        return localDataStore.getMovieDetail(imdbId)
+            .flatMapPublisher { localMovieDetail ->
+                Flowable.just(localMovieDetail)
+                    .mergeWith(
+                        remoteDataStore.getMovieDetail(imdbId)
+                            .flatMap { remoteMovieDetail ->
+                                localDataStore.addMovieDetail(remoteMovieDetail)
+                                    .andThen(Single.just(remoteMovieDetail))
+                            }
+                            .onErrorComplete()
+                    )
+            }
+            .onErrorResumeNext {
+                remoteDataStore.getMovieDetail(imdbId)
+                    .flatMap { remoteMovieDetail ->
+                        localDataStore.addMovieDetail(remoteMovieDetail)
+                            .andThen(Single.just(remoteMovieDetail))
+                    }
+                    .toFlowable()
+            }
     }
 }
