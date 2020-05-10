@@ -4,6 +4,7 @@ import android.app.Application
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.injection.dataModule
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.injection.presentationModule
 import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import timber.log.Timber
 
@@ -12,6 +13,7 @@ class MovieApp : Application() {
         super.onCreate()
 
         startKoin {
+            androidLogger()
             // declare used Android context
             androidContext(applicationContext)
             // declare modules

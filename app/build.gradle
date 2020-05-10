@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlinx-serialization'
 
 apply plugin: 'jacoco'
 
@@ -76,7 +77,7 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
   implementation 'androidx.core:core-ktx:1.2.0'
   implementation 'androidx.appcompat:appcompat:1.1.0'
-  implementation 'androidx.lifecycle:lifecycle-reactivestreams-ktx:2.3.0-alpha01'
+  implementation 'androidx.lifecycle:lifecycle-reactivestreams-ktx:2.3.0-alpha02'
 
   implementation "androidx.ui:ui-foundation:$compose_version"
   implementation "androidx.ui:ui-framework:$compose_version"
@@ -123,4 +124,15 @@ dependencies {
   androidTestImplementation 'com.android.support.test:runner:1.0.2'
   androidTestImplementation "de.mannodermaus.junit5:android-test-core:1.0.0"
   androidTestRuntimeOnly "de.mannodermaus.junit5:android-test-runner:1.0.0"
+
+  //Room DB
+  def room_version = "2.2.5"
+
+  implementation "androidx.room:room-runtime:$room_version"
+  implementation "androidx.room:room-ktx:$room_version"
+  implementation "androidx.room:room-rxjava2:$room_version"
+  kapt "androidx.room:room-compiler:$room_version"
+  //RxJava3 Bridge Required as Room doesn't support RxJava2 yet
+  implementation "com.github.akarnokd:rxjava3-bridge:3.0.0"
+  implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0"
 }
