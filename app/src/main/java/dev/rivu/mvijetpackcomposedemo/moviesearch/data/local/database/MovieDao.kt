@@ -13,6 +13,9 @@ interface MovieDao {
     @Query("select * from movies where title like '%' || :searchQuery || '%'")
     fun getMovies(searchQuery: String): Single<List<MovieEnitity>>
 
+    @Query("select * from movies where imdbID = :imdbID")
+    fun getMovie(imdbID: String): Single<MovieEnitity>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun addMovies(movieList: List<MovieEnitity>): Completable
 

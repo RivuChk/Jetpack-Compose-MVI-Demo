@@ -1,11 +1,10 @@
+import androidx.room.EmptyResultSetException
 import com.nhaarman.mockitokotlin2.*
-import dev.rivu.mvijetpackcomposedemo.moviesearch.data.EmptyResultSetException
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.MovieDataStore
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.MovieRepository
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.datafactory.dummyMovieDetail
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.datafactory.dummyMovieSearchList
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
-import dev.rivu.mvijetpackcomposedemo.moviesearch.data.remote.model.MovieSearchResponse
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import org.mockito.ArgumentMatchers.anyList

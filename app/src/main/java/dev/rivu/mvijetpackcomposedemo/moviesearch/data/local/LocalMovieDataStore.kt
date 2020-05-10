@@ -1,14 +1,15 @@
 package dev.rivu.mvijetpackcomposedemo.moviesearch.data.local
 
-import dev.rivu.mvijetpackcomposedemo.moviesearch.data.EmptyResultSetException
+import androidx.room.EmptyResultSetException
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.MovieDataStore
+import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.MovieDao
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.MovieDetail
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 
-class LocalMovieDataStore : MovieDataStore {
+class LocalMovieDataStore(private val movieDao: MovieDao) : MovieDataStore {
 
     //Not Implementing DB (Room DB) here as Jetpack Compose has some conflicts with kapt
     //once that's resolved, we will implement Room DB here

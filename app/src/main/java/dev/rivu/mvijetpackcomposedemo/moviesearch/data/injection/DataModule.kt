@@ -19,7 +19,7 @@ val dataModule = module {
 
     single { get<MovieDB>().movieDao() }
 
-    single<MovieDataStore>(named("local")) { LocalMovieDataStore() }
+    single<MovieDataStore>(named("local")) { LocalMovieDataStore(get()) }
     single<MovieDataStore>(named("remote")) { RemoteMovieDataStore(get()) }
 
     single<IMovieRepository> { MovieRepository(get(named("local")), get(named("remote"))) }

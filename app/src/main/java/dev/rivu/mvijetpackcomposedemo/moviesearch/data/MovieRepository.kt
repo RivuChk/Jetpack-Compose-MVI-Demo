@@ -1,11 +1,11 @@
 package dev.rivu.mvijetpackcomposedemo.moviesearch.data
 
+import androidx.room.EmptyResultSetException
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.MovieDetail
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.core.SingleSource
 
 class MovieRepository(
     private val localDataStore: MovieDataStore,
