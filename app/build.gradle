@@ -10,12 +10,12 @@ apply plugin: 'jacoco'
 apply plugin: 'de.mannodermaus.android-junit5'
 
 android {
-  compileSdkVersion 29
+  compileSdkVersion 30
 
   defaultConfig {
     applicationId "dev.rivu.mvijetpackcomposedemo"
     minSdkVersion 24
-    targetSdkVersion 29
+    targetSdkVersion 30
     versionCode 1
     versionName "1.0"
 
