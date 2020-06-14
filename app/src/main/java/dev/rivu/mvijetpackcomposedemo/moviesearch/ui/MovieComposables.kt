@@ -2,16 +2,17 @@ package dev.rivu.mvijetpackcomposedemo.moviesearch.ui
 
 import android.content.Context
 import androidx.compose.Composable
-import androidx.compose.MutableState
 import androidx.compose.getValue
+import androidx.compose.setValue
 import androidx.compose.state
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.ui.core.Alignment
 import androidx.ui.core.Modifier
 import androidx.ui.foundation.AdapterList
-import androidx.ui.foundation.Clickable
 import androidx.ui.foundation.Image
 import androidx.ui.foundation.Text
+import androidx.ui.foundation.clickable
 import androidx.ui.graphics.imageFromResource
 import androidx.ui.layout.Arrangement
 import androidx.ui.layout.Column
@@ -35,38 +36,62 @@ fun MoviesScreen(
 ) {
     val moviesState: MoviesState by stateLiveData.observeAsState(MoviesState.initialState())
 
-    val title = state { "Search Movies" }
-
     Column {
-        TopAppBar(Modifier) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalGravity = Alignment.CenterHorizontally
-            ) {
-                Text(title.value)
+        val movieDetail = moviesState.detail
+        //Appbar
+        when {
+            moviesState.isDetailState() && movieDetail != null -> {
+                Appbar(context = context, title = movieDetail.title, onSearch = onSearch, isDetail = true)
             }
-            Column(verticalArrangement = Arrangement.Center, horizontalGravity = Alignment.End) {
-                Clickable(onClick = {
-                    onSearch("Jack")
-                }) {
-                    Image(
-                        imageFromResource(context.resources, R.drawable.ic_search)
-                    )
-                }
+            !moviesState.query.isNullOrBlank() -> {
+                Appbar(context = context, title = moviesState.query, onSearch = onSearch)
+            }
+            moviesState.isLoading() -> {
+                Appbar(context = context, title = "Loading", onSearch = onSearch)
+            }
+            else -> {
+                Appbar(context = context, title = "Search Movies", onSearch = onSearch)
             }
         }
 
+        //Content
         when {
-            moviesState.isIdleState() -> IdleScreen()
-            moviesState.isLoading() -> LoadingScreen()
-            moviesState.isDetailState() -> {
-                val movieDetail = moviesState.detail!!
+            moviesState.isIdleState() -> {
+                IdleScreen()
+            }
+            moviesState.isLoading() -> {
+                LoadingScreen()
+            }
+            moviesState.isDetailState() && movieDetail != null -> {
                 DetailScreen(movieDetail)
-                title.value = movieDetail.title
             }
             moviesState.movies.isNotEmpty() -> {
-                title.value = moviesState.query
                 ListScreen(moviesState.movies, onMovieClick)
+            }
+            moviesState.error != null -> {
+                ErrorScreen(moviesState.error!!)
+            }
+        }
+    }
+}
+
+@Composable
+fun Appbar(context: Context, title: String, onSearch: (String) -> Unit, isDetail: Boolean = false) {
+    TopAppBar {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalGravity = Alignment.CenterHorizontally
+        ) {
+            Text(title)
+        }
+        if (!isDetail) { //hide search bar in detail screen
+            Column(verticalArrangement = Arrangement.Center, horizontalGravity = Alignment.End) {
+                Image(
+                    imageFromResource(context.resources, R.drawable.ic_search),
+                    modifier = Modifier.clickable(onClick = {
+                        onSearch("Jack")
+                    })
+                )
             }
         }
     }
@@ -95,11 +120,12 @@ fun DetailScreen(movieDetail: MovieDetail) {
 @Composable
 fun ListScreen(movieList: List<Movie>, onMovieClick: (String) -> Unit) {
     AdapterList(movieList) { movie ->
-        Clickable(onClick = {
-            onMovieClick(movie.imdbID)
-        }) {
-            Text("Movie: ${movie.title}")
-        }
+        Text(
+            "Movie: ${movie.title}",
+            modifier = Modifier.clickable(onClick = {
+                onMovieClick(movie.imdbID)
+            })
+        )
     }
 }
 
@@ -121,5 +147,6 @@ fun LoadingScreen() {
 sealed class SearchState {
     object Icon : SearchState()
     data class Typing(val typedText: String) : SearchState()
-    data class SearchTapped(val typedText: String) : SearchState()
+    data class SearchTyped(val typedText: String) : SearchState()
+    data class Detail(val typedText: String) : SearchState()
 }
