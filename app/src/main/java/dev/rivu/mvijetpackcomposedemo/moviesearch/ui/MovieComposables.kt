@@ -19,7 +19,9 @@ import androidx.ui.layout.Column
 import androidx.ui.livedata.observeAsState
 import androidx.ui.material.CircularProgressIndicator
 import androidx.ui.material.TopAppBar
+import androidx.ui.tooling.preview.Preview
 import dev.rivu.mvijetpackcomposedemo.R
+import dev.rivu.mvijetpackcomposedemo.SEARCH_HINT
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.MovieDetail
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MoviesState
@@ -41,16 +43,13 @@ fun MoviesScreen(
         //Appbar
         when {
             moviesState.isDetailState() && movieDetail != null -> {
-                Appbar(context = context, title = movieDetail.title, onSearch = onSearch, isDetail = true)
+                Appbar(context = context, searchState = SearchState.Detail(movieDetail.title), onSearch = onSearch)
             }
             !moviesState.query.isNullOrBlank() -> {
-                Appbar(context = context, title = moviesState.query, onSearch = onSearch)
-            }
-            moviesState.isLoading() -> {
-                Appbar(context = context, title = "Loading", onSearch = onSearch)
+                Appbar(context = context, searchState = SearchState.SearchTyped(moviesState.query), onSearch = onSearch)
             }
             else -> {
-                Appbar(context = context, title = "Search Movies", onSearch = onSearch)
+                Appbar(context = context, searchState = SearchState.Icon, onSearch = onSearch)
             }
         }
 
@@ -76,15 +75,15 @@ fun MoviesScreen(
 }
 
 @Composable
-fun Appbar(context: Context, title: String, onSearch: (String) -> Unit, isDetail: Boolean = false) {
+fun Appbar(context: Context, searchState: SearchState, onSearch: (String) -> Unit) {
     TopAppBar {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalGravity = Alignment.CenterHorizontally
         ) {
-            Text(title)
+            Text(searchState.titlebarText)
         }
-        if (!isDetail) { //hide search bar in detail screen
+        if (searchState !is SearchState.Detail) { //hide search bar in detail screen
             Column(verticalArrangement = Arrangement.Center, horizontalGravity = Alignment.End) {
                 Image(
                     imageFromResource(context.resources, R.drawable.ic_search),
@@ -135,18 +134,34 @@ fun ErrorScreen(throwable: Throwable) {
         verticalArrangement = Arrangement.Center,
         horizontalGravity = Alignment.CenterHorizontally
     ) {
-        Text("Detail ${throwable.localizedMessage}")
+        Text("Error Showing Movies :: ${throwable.localizedMessage}")
     }
 }
 
 @Composable
+@Preview
 fun LoadingScreen() {
     CircularProgressIndicator()
 }
 
-sealed class SearchState {
-    object Icon : SearchState()
-    data class Typing(val typedText: String) : SearchState()
-    data class SearchTyped(val typedText: String) : SearchState()
-    data class Detail(val typedText: String) : SearchState()
+@Composable
+@Preview
+fun listPreview() {
+    ListScreen(movieList = listOf(
+        Movie(
+            title = "dsdad"
+        )), onMovieClick = {})
+}
+
+@Composable
+@Preview
+fun errorPreview() {
+    ErrorScreen(Exception("Unknown"))
+}
+
+sealed class SearchState(val titlebarText: String) {
+    object Icon : SearchState(SEARCH_HINT)
+    data class Typing(val typedText: String) : SearchState(typedText + "...")
+    data class SearchTyped(val typedText: String) : SearchState(typedText)
+    data class Detail(val movieTitle: String) : SearchState(movieTitle)
 }
