@@ -2,6 +2,7 @@ package dev.rivu.mvijetpackcomposedemo
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.ui.core.setContent
 import androidx.ui.material.MaterialTheme
@@ -21,6 +22,9 @@ class MainActivity : AppCompatActivity() {
     val liveData by lazy {
         moviesViewModel.states()
     }
+
+    val searchHistory = mutableListOf<String>()
+
 
     val searchPublisher: PublishSubject<MovieIntent.SearchIntent> = PublishSubject.create()
     val clickPublisher: PublishSubject<MovieIntent.ClickIntent> = PublishSubject.create()
@@ -43,6 +47,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun search(query: String) {
+        searchHistory.add(query)
+        searchWithoutHistory(query)
+    }
+
+    private fun searchWithoutHistory(query: String) {
         searchPublisher.onNext(MovieIntent.SearchIntent(query))
     }
 
@@ -50,12 +59,18 @@ class MainActivity : AppCompatActivity() {
         clickPublisher.onNext(MovieIntent.ClickIntent(imdbId))
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     override fun onBackPressed() {
         val state = liveData.value
         if (state != null && state.isDetailState()) {
             clearClickPublisher.onNext(MovieIntent.ClearClickIntent)
         } else {
-            super.onBackPressed()
+            val pastSearch = searchHistory.removeLastOrNull()
+            if (pastSearch != null) {
+                searchWithoutHistory(pastSearch)
+            } else {
+                super.onBackPressed()
+            }
         }
     }
 

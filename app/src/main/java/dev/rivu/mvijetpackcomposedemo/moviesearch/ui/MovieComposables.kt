@@ -3,10 +3,13 @@ package dev.rivu.mvijetpackcomposedemo.moviesearch.ui
 import android.content.Context
 import android.util.Log
 import androidx.compose.*
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.ui.core.Alignment
 import androidx.ui.core.Layout
+import androidx.ui.core.LifecycleOwnerAmbient
 import androidx.ui.core.Modifier
 import androidx.ui.foundation.*
 import androidx.ui.graphics.imageFromResource
@@ -33,6 +36,7 @@ import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.isDetailState
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.isIdleState
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.isLoading
 
+@OptIn(ExperimentalStdlibApi::class)
 @Composable
 fun MoviesScreen(
     context: Context,
@@ -60,7 +64,7 @@ fun MoviesScreen(
 
         //Appbar
         Appbar(context = context, searchState = searchState.value) {
-            searchState.value = SearchState.Typing("")
+            searchState.value = SearchState.Typing()
         }
 
         //Content
@@ -164,7 +168,7 @@ fun LoadingScreen() {
 fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
     val typedText = state { TextFieldValue(hint) }
     Column {
-        Row {
+        Row(modifier = Modifier.padding(5.dp)) {
             Text(text = "Enter Movie Name to Search")
         }
         Row {
@@ -225,7 +229,7 @@ fun errorPreview() {
 
 sealed class SearchState(val titlebarText: String) {
     object Icon : SearchState(SEARCH_HINT)
-    data class Typing(val typedText: String) : SearchState(typedText + "...")
+    data class Typing(val typedText: String = "Typing...") : SearchState(typedText)
     data class SearchTyped(val typedText: String) : SearchState(typedText)
     data class Detail(val movieTitle: String) : SearchState(movieTitle)
 }
