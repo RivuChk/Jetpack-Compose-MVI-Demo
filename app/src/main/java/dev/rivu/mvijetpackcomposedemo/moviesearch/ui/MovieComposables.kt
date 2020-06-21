@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.ui.core.Alignment
 import androidx.ui.core.Modifier
 import androidx.ui.core.TestTag
+import androidx.ui.core.testTag
 import androidx.ui.foundation.*
 import androidx.ui.graphics.imageFromResource
 import androidx.ui.layout.*
@@ -88,22 +89,22 @@ fun MoviesScreen(
 
 @Composable
 fun Appbar(context: Context, searchState: SearchState, onSearchTapped: () -> Unit) {
-    TestTag(tag = "appbar") {
-        TopAppBar {
+    TopAppBar(Modifier.testTag("appbar")) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalGravity = Alignment.CenterHorizontally
+        ) {
+            Text(searchState.titlebarText)
+        }
+        if (searchState !is SearchState.Detail) { //hide search bar in detail screen
             Column(
                 verticalArrangement = Arrangement.Center,
-                horizontalGravity = Alignment.CenterHorizontally
+                horizontalGravity = Alignment.End
             ) {
-                Text(searchState.titlebarText)
-            }
-            if (searchState !is SearchState.Detail) { //hide search bar in detail screen
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalGravity = Alignment.End
-                ) {
+                TestTag(tag = "searchIcon") {
                     Image(
                         imageFromResource(context.resources, R.drawable.ic_search),
-                        modifier = Modifier.clickable(onClick = onSearchTapped)
+                        modifier = Modifier.clickable(onClick = onSearchTapped).testTag("searchicon")
                     )
                 }
             }
@@ -156,7 +157,7 @@ fun ErrorScreen(throwable: Throwable) {
 @Composable
 @Preview
 fun LoadingScreen() {
-    CircularProgressIndicator()
+    CircularProgressIndicator(Modifier.testTag("progressbar"))
 }
 
 @Composable
@@ -164,14 +165,12 @@ fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
     val typedText = state { TextFieldValue(hint) }
     Column {
         Row(modifier = Modifier.padding(5.dp)) {
-            TestTag(tag = "title") {
-                Text(text = "Enter Movie Name to Search")
-            }
+            Text(text = "Enter Movie Name to Search")
         }
         Row {
             TextField(
                 value = typedText.value,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag("searchBar"),
                 onValueChange = {
                     typedText.value = it
                 },
@@ -186,7 +185,7 @@ fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
                 Button(modifier = Modifier.padding(5.dp), onClick = {
                     onSearch(typedText.value.text)
                 }) {
-                    Text(text = "Search")
+                    Text(text = "Search", modifier = Modifier.testTag("searchButton"))
                 }
             }
             Column {
