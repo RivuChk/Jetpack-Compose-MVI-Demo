@@ -14,7 +14,6 @@ import kotlin.random.Random
  * Launches the app from a test context
  */
 fun ComposeTestRule.launchMoviesApp(
-    context: Context,
     stateLiveData: LiveData<MoviesState>,
     onSearch: (String) -> Unit,
     onMovieClick: (String) -> Unit
@@ -23,7 +22,6 @@ fun ComposeTestRule.launchMoviesApp(
         MaterialTheme {
             Surface {
                 MoviesScreen(
-                    context = context,
                     stateLiveData = stateLiveData,
                     onSearch = onSearch,
                     onMovieClick = onMovieClick

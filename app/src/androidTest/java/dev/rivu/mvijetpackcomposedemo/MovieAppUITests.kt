@@ -9,6 +9,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MoviesState
+import dev.rivu.mvijetpackcomposedemo.moviesearch.ui.APPBAR_SEARCH_ICON_TAG
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
@@ -43,7 +44,6 @@ class MovieAppUITests {
 
         // Using targetContext as the Context of the instrumentation code
         composeTestRule.launchMoviesApp(
-            InstrumentationRegistry.getInstrumentation().targetContext,
             statesLiveData,
             mockOnSearch, mockOnMovieClick
         )
@@ -57,14 +57,14 @@ class MovieAppUITests {
     @Test
     fun test_idle_state() {
         statesLiveData.postValue(MoviesState.initialState())
-        findByTag("searchIcon").assertIsDisplayed()
+        findByTag(APPBAR_SEARCH_ICON_TAG).assertIsDisplayed()
     }
 
     @Test
     fun test_search_action() {
         val searchQuery = "jack"
         statesLiveData.postValue(MoviesState.initialState())
-        val searchIcon = findByTag("searchIcon")
+        val searchIcon = findByTag(APPBAR_SEARCH_ICON_TAG)
 
         searchIcon.doClick()
 
@@ -79,7 +79,7 @@ class MovieAppUITests {
     @Test
     fun test_loading_state() {
         statesLiveData.postValue(MoviesState.initialState().copy(isLoading = true))
-        findByTag("progressbar").assertIsDisplayed()
+        findByTag("progressbar").assertIsHidden()
     }
 
     @Ignore("fails due to idling issue: https://github.com/RivuChk/Jetpack-Compose-MVI-Demo/issues/1")

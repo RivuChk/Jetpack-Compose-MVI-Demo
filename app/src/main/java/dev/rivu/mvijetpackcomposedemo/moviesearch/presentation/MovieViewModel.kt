@@ -45,7 +45,8 @@ class MovieViewModel(
                     query = result.query,
                     movies = result.movies,
                     error = null,
-                    isLoading = false
+                    isLoading = false,
+                    detail = null
                 )
                 is MovieResult.SearchResult.Failure -> previousState.copy(
                     query = result.query,

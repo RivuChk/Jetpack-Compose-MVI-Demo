@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
-                MoviesScreen(this, liveData, ::search, ::click)
+                MoviesScreen(liveData, ::search, ::click)
             }
         }
 

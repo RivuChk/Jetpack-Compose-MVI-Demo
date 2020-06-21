@@ -117,6 +117,10 @@ dependencies {
   implementation "com.squareup.retrofit2:converter-gson:2.8.1"
   implementation "com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0"
 
+  //Glide
+  implementation 'com.github.bumptech.glide:glide:4.11.0'
+  kapt 'com.github.bumptech.glide:compiler:4.11.0'
+
   //Timber
   implementation "com.jakewharton.timber:timber:4.7.1"
 
