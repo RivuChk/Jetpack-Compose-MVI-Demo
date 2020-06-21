@@ -75,14 +75,14 @@ class MovieAppUITests {
         verify(mockOnSearch).invoke(searchQuery)
     }
 
-    @Ignore("fails due to idling issue: IdlingResourceTimeoutException: Wait for [ComposeIdlingResource] to become idle timed out")
+    @Ignore("fails due to idling issue: https://github.com/RivuChk/Jetpack-Compose-MVI-Demo/issues/1")
     @Test
     fun test_loading_state() {
         statesLiveData.postValue(MoviesState.initialState().copy(isLoading = true))
         findByTag("progressbar").assertIsDisplayed()
     }
 
-    @Ignore("fails due to idling issue: IdlingResourceTimeoutException: Wait for [ComposeIdlingResource] to become idle timed out")
+    @Ignore("fails due to idling issue: https://github.com/RivuChk/Jetpack-Compose-MVI-Demo/issues/1")
     @Test
     fun test_list_state() {
         val initialState = MoviesState.initialState()
