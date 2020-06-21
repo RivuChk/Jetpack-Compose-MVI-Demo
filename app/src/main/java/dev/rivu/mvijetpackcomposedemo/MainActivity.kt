@@ -2,7 +2,6 @@ package dev.rivu.mvijetpackcomposedemo
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.ui.core.setContent
 import androidx.ui.material.MaterialTheme

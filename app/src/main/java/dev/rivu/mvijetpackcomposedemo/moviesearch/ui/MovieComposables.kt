@@ -5,28 +5,18 @@ import android.util.Log
 import androidx.compose.*
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.ui.core.Alignment
-import androidx.ui.core.Layout
-import androidx.ui.core.LifecycleOwnerAmbient
 import androidx.ui.core.Modifier
+import androidx.ui.core.TestTag
 import androidx.ui.foundation.*
 import androidx.ui.graphics.imageFromResource
-import androidx.ui.input.ImeAction
-import androidx.ui.input.KeyboardType
-import androidx.ui.input.VisualTransformation
 import androidx.ui.layout.*
-import androidx.ui.layout.ColumnScope.weight
 import androidx.ui.livedata.observeAsState
 import androidx.ui.material.Button
 import androidx.ui.material.CircularProgressIndicator
 import androidx.ui.material.TopAppBar
-import androidx.ui.text.TextLayoutResult
-import androidx.ui.text.TextStyle
 import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.dp
-import androidx.ui.unit.ipx
 import dev.rivu.mvijetpackcomposedemo.R
 import dev.rivu.mvijetpackcomposedemo.SEARCH_HINT
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
@@ -98,19 +88,24 @@ fun MoviesScreen(
 
 @Composable
 fun Appbar(context: Context, searchState: SearchState, onSearchTapped: () -> Unit) {
-    TopAppBar {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalGravity = Alignment.CenterHorizontally
-        ) {
-            Text(searchState.titlebarText)
-        }
-        if (searchState !is SearchState.Detail) { //hide search bar in detail screen
-            Column(verticalArrangement = Arrangement.Center, horizontalGravity = Alignment.End) {
-                Image(
-                    imageFromResource(context.resources, R.drawable.ic_search),
-                    modifier = Modifier.clickable(onClick = onSearchTapped)
-                )
+    TestTag(tag = "appbar") {
+        TopAppBar {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalGravity = Alignment.CenterHorizontally
+            ) {
+                Text(searchState.titlebarText)
+            }
+            if (searchState !is SearchState.Detail) { //hide search bar in detail screen
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalGravity = Alignment.End
+                ) {
+                    Image(
+                        imageFromResource(context.resources, R.drawable.ic_search),
+                        modifier = Modifier.clickable(onClick = onSearchTapped)
+                    )
+                }
             }
         }
     }
@@ -169,7 +164,9 @@ fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
     val typedText = state { TextFieldValue(hint) }
     Column {
         Row(modifier = Modifier.padding(5.dp)) {
-            Text(text = "Enter Movie Name to Search")
+            TestTag(tag = "title") {
+                Text(text = "Enter Movie Name to Search")
+            }
         }
         Row {
             TextField(
