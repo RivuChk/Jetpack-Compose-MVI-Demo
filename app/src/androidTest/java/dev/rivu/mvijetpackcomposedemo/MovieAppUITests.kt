@@ -67,7 +67,7 @@ class MovieAppUITests {
         val searchIcon = findByTag(APPBAR_SEARCH_ICON_TAG)
 
         searchIcon.doClick()
-
+        findByTag("searchBar").doClearText(false)
         findByTag("searchBar").doSendText(searchQuery, false)
 
         findByTag("searchButton").doClick()
