@@ -81,7 +81,7 @@ class MovieRepositorySpecTest : Spek({
             }
         }
 
-        context("both DataStore emits empty data") {
+        context("both DataStore emits data") {
 
             val dummyLocalData = dummyMovieSearchList
             val dummyRemoteData = dummyMovieSearchList
