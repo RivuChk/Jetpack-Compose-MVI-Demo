@@ -7,6 +7,7 @@ import androidx.compose.state
 import androidx.lifecycle.LiveData
 import androidx.ui.core.*
 import androidx.ui.foundation.*
+import androidx.ui.foundation.lazy.LazyColumnItems
 import androidx.ui.foundation.shape.corner.RoundedCornerShape
 import androidx.ui.graphics.Color
 import androidx.ui.graphics.imageFromResource
@@ -204,7 +205,7 @@ fun DetailScreen(movieDetail: MovieDetail) {
 
 @Composable
 fun ListScreen(movieList: List<Movie>, onMovieClick: (String) -> Unit) {
-    AdapterList(movieList) { movie ->
+    LazyColumnItems(movieList, modifier = Modifier.testTag("movieList")) { movie ->
         Box(modifier = Modifier.padding(5.dp).fillMaxWidth().heightIn(maxHeight = 150.dp).clickable(onClick = {
             onMovieClick(movie.imdbID)
         })) {
