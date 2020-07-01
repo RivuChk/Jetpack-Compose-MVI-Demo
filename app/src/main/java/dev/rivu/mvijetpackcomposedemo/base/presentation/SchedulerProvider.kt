@@ -1,6 +1,5 @@
-package dev.rivu.mvijetpackcomposedemo.moviesearch.presentation
+package dev.rivu.mvijetpackcomposedemo.base.presentation
 
-import dev.rivu.mvijetpackcomposedemo.base.presentation.ISchedulerProvider
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.schedulers.Schedulers

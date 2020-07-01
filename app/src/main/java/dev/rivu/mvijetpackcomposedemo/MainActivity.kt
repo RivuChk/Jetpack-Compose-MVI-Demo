@@ -1,22 +1,24 @@
 package dev.rivu.mvijetpackcomposedemo
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.ui.core.setContent
 import androidx.ui.material.MaterialTheme
+import dagger.hilt.android.AndroidEntryPoint
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MovieIntent
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MovieViewModel
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.isDetailState
 import dev.rivu.mvijetpackcomposedemo.moviesearch.ui.MoviesScreen
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    val moviesViewModel: MovieViewModel by viewModel()
+    val moviesViewModel: MovieViewModel by viewModels()
 
     val liveData by lazy {
         moviesViewModel.states()

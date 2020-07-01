@@ -1,26 +1,63 @@
 package dev.rivu.mvijetpackcomposedemo.moviesearch.data.injection
 
+import android.content.Context
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.IMovieRepository
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.MovieDataStore
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.MovieRepository
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.LocalMovieDataStore
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.MovieDB
+import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.MovieDao
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.remote.MovieApi
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.remote.MovieApiFactory
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.remote.RemoteMovieDataStore
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
+import javax.inject.Named
+import javax.inject.Singleton
 
-val dataModule = module {
+@Module
+@InstallIn(ActivityComponent::class)
+object DataModule {
 
-    single { MovieApiFactory.makeMovieApi() }
 
-    single { MovieDB.getInstance(get()) }
+    @Provides
+    @Named("local")
+    fun provideLocalMovieDataStore(dao: MovieDao): MovieDataStore = LocalMovieDataStore(dao)
 
-    single { get<MovieDB>().movieDao() }
 
-    single<MovieDataStore>(named("local")) { LocalMovieDataStore(get()) }
-    single<MovieDataStore>(named("remote")) { RemoteMovieDataStore(get()) }
+    @Provides
+    @Named("remote")
+    fun provideRemoteMovieDataStore(api: MovieApi): MovieDataStore = RemoteMovieDataStore(api)
 
-    single<IMovieRepository> { MovieRepository(get(named("local")), get(named("remote"))) }
+
+    @Provides
+    fun provideMovieRepository(
+        @Named("local") localMovieDataStore: MovieDataStore,
+        @Named("remote") remoteMovieDataStore: MovieDataStore
+    ): IMovieRepository = MovieRepository(localMovieDataStore, remoteMovieDataStore)
+}
+
+@Module
+@InstallIn(ApplicationComponent::class)
+object AppDataModule {
+
+    @Provides
+    @Singleton
+    fun provideMovieApi(): MovieApi = MovieApiFactory.makeMovieApi()
+
+
+    @Provides
+    @Singleton
+    fun provideDB(@ApplicationContext context: Context): MovieDB = MovieDB.getInstance(context)
+
+
+    @Provides
+    @Singleton
+    fun provideMovieDao(db: MovieDB): MovieDao = db.movieDao()
+
+
 }

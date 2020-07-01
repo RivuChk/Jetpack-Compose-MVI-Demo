@@ -1,12 +1,13 @@
 package dev.rivu.mvijetpackcomposedemo.moviesearch.presentation
 
+import androidx.hilt.lifecycle.ViewModelInject
 import dev.rivu.mvijetpackcomposedemo.base.presentation.BaseViewModel
 import dev.rivu.mvijetpackcomposedemo.base.presentation.ISchedulerProvider
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableTransformer
 import io.reactivex.rxjava3.functions.BiFunction
 
-class MovieViewModel(
+class MovieViewModel @ViewModelInject constructor(
     override val actionProcessor: MovieProcessor
 ) :
     BaseViewModel<MovieIntent, MoviesState, MovieAction, MovieResult>() {
