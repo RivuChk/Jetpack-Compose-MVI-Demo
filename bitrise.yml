@@ -3,10 +3,10 @@ format_version: '8'
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: android
 trigger_map:
-- push_branch: "*"
-  workflow: primary
-- pull_request_source_branch: "*"
-  workflow: primary
+  - push_branch: "*"
+    workflow: primary
+  - pull_request_source_branch: "*"
+    workflow: primary
 workflows:
   deploy:
     description: |
@@ -42,69 +42,76 @@ workflows:
 
       The next change in your repository that matches any of your trigger map event will start **deploy** workflow.
     steps:
-    - activate-ssh-key@4:
-        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
-    - git-clone@4: {}
-    - cache-pull@2: {}
-    - script@1:
-        title: Do anything with Script step
-    - install-missing-android-tools@2:
-        inputs:
-        - gradlew_path: "$PROJECT_LOCATION/gradlew"
-    - change-android-versioncode-and-versionname@1:
-        inputs:
-        - build_gradle_path: "$PROJECT_LOCATION/$MODULE/build.gradle"
-    - android-lint@0:
-        inputs:
-        - project_location: "$PROJECT_LOCATION"
-        - module: "$MODULE"
-        - variant: "$VARIANT"
-    - android-unit-test@1:
-        inputs:
-        - project_location: "$PROJECT_LOCATION"
-        - module: "$MODULE"
-        - variant: "$VARIANT"
-    - android-build@0:
-        inputs:
-        - project_location: "$PROJECT_LOCATION"
-        - module: "$MODULE"
-        - variant: "$VARIANT"
-    - sign-apk@1:
-        run_if: '{{getenv "BITRISEIO_ANDROID_KEYSTORE_URL" | ne ""}}'
-    - deploy-to-bitrise-io@1: {}
-    - cache-push@2: {}
+      - activate-ssh-key@4:
+          run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
+      - git-clone@4: {}
+      - cache-pull@2: {}
+      - script@1:
+          title: Do anything with Script step
+      - install-missing-android-tools@2:
+          inputs:
+            - gradlew_path: "$PROJECT_LOCATION/gradlew"
+      - change-android-versioncode-and-versionname@1:
+          inputs:
+            - build_gradle_path: "$PROJECT_LOCATION/$MODULE/build.gradle"
+      - android-lint@0:
+          inputs:
+            - project_location: "$PROJECT_LOCATION"
+            - module: "$MODULE"
+            - variant: "$VARIANT"
+      - android-unit-test@1:
+          inputs:
+            - project_location: "$PROJECT_LOCATION"
+            - module: "$MODULE"
+            - variant: "$VARIANT"
+      - android-build@0:
+          inputs:
+            - project_location: "$PROJECT_LOCATION"
+            - module: "$MODULE"
+            - variant: "$VARIANT"
+      - sign-apk@1:
+          run_if: '{{getenv "BITRISEIO_ANDROID_KEYSTORE_URL" | ne ""}}'
+      - deploy-to-bitrise-io@1: {}
+      - cache-push@2: {}
   primary:
     steps:
-    - activate-ssh-key@4:
-        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
-    - git-clone@4: {}
-    - cache-pull@2: {}
-    - script@1:
-        title: Do anything with Script step
-    - install-missing-android-tools@2:
-        inputs:
-        - gradlew_path: "$PROJECT_LOCATION/gradlew"
-    - android-lint@0:
-        inputs:
-        - project_location: "$PROJECT_LOCATION"
-        - module: "$MODULE"
-        - variant: "$VARIANT"
-    - android-unit-test@1:
-        inputs:
-        - project_location: "$PROJECT_LOCATION"
-        - module: "$MODULE"
-        - variant: "$VARIANT"
-        is_always_run: true
-    - deploy-to-bitrise-io@1: {}
-    - cache-push@2: {}
+      - activate-ssh-key@4:
+          run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
+      - git-clone@4: {}
+      - cache-pull@2: {}
+      - script@1:
+          title: Do anything with Script step
+      - install-missing-android-tools@2:
+          inputs:
+            - gradlew_path: "$PROJECT_LOCATION/gradlew"
+      - android-lint@0:
+          inputs:
+            - project_location: "$PROJECT_LOCATION"
+            - module: "$MODULE"
+            - variant: "$VARIANT"
+      - android-unit-test@1:
+          inputs:
+            - project_location: "$PROJECT_LOCATION"
+            - module: "$MODULE"
+            - variant: "$VARIANT"
+          is_always_run: true
+      - android-build@0:
+          inputs:
+            - module: app
+            - build_type: aab
+      - sign-apk@1:
+          inputs:
+            - output_name: "$BITRISE_APP_TITLE-$BITRISE_GIT_BRANCH-$BITRISE_BUILD_NUMBER"
+      - deploy-to-bitrise-io@1: {}
+      - cache-push@2: {}
 app:
   envs:
-  - opts:
-      is_expand: false
-    PROJECT_LOCATION: "."
-  - opts:
-      is_expand: false
-    MODULE: app
-  - opts:
-      is_expand: false
-    VARIANT: ''
+    - opts:
+        is_expand: false
+      PROJECT_LOCATION: "."
+    - opts:
+        is_expand: false
+      MODULE: app
+    - opts:
+        is_expand: false
+      VARIANT: ''
