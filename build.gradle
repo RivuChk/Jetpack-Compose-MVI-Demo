@@ -11,7 +11,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:4.2.0-alpha02'
+    classpath 'com.android.tools.build:gradle:4.2.0-alpha03'
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     classpath "de.mannodermaus.gradle.plugins:android-junit5:$android_junit5_version"
     classpath "org.jacoco:org.jacoco.core:$jacoco_version"

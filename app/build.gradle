@@ -129,7 +129,7 @@ dependencies {
   implementation "com.jakewharton.timber:timber:4.7.1"
 
   //Test
-  implementation "org.mockito:mockito-core:3.1.0"
+  implementation "org.mockito:mockito-core:3.3.3"
   implementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
   androidTestImplementation "org.mockito:mockito-android:3.3.3"
   implementation "org.hamcrest:hamcrest-all:1.3"
