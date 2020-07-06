@@ -2,7 +2,6 @@ package dev.rivu.mvijetpackcomposedemo
 
 import androidx.lifecycle.MutableLiveData
 import androidx.test.filters.MediumTest
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.ui.animation.transitionsEnabled
 import androidx.ui.test.*
 import androidx.ui.test.android.AndroidComposeTestRule
@@ -12,7 +11,6 @@ import com.nhaarman.mockitokotlin2.whenever
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MoviesState
 import dev.rivu.mvijetpackcomposedemo.moviesearch.ui.APPBAR_SEARCH_ICON_TAG
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -87,7 +85,6 @@ class MovieAppUITests {
         findByTag("progressbar").assertExists()
     }
 
-    //@Ignore("fails due to idling issue: https://github.com/RivuChk/Jetpack-Compose-MVI-Demo/issues/1")
     @Test
     fun test_list_state() {
         val initialState = MoviesState.initialState()
