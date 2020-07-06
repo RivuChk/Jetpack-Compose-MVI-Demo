@@ -3,6 +3,7 @@ package dev.rivu.mvijetpackcomposedemo.moviesearch.ui
 import android.util.Log
 import androidx.compose.Composable
 import androidx.compose.getValue
+import androidx.compose.remember
 import androidx.compose.state
 import androidx.lifecycle.LiveData
 import androidx.ui.core.*
@@ -31,6 +32,7 @@ import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MoviesState
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.isDetailState
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.isIdleState
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.isLoading
+import timber.log.Timber
 
 @OptIn(ExperimentalStdlibApi::class)
 @Composable
@@ -41,48 +43,39 @@ fun MoviesScreen(
 ) {
     val moviesState: MoviesState by stateLiveData.observeAsState(MoviesState.initialState())
     val movieDetail = moviesState.detail
-    val searchState = state {
-        when {
-            moviesState.isDetailState() && movieDetail != null -> {
-                SearchState.Detail(movieDetail.title)
-            }
-            !moviesState.query.isNullOrBlank() -> {
-                SearchState.SearchTyped(moviesState.query)
-            }
-            else -> {
-                SearchState.Icon
-            }
+    val searchState = when {
+        moviesState.isDetailState() && movieDetail != null -> {
+            SearchState.Detail(movieDetail.title)
+        }
+        !moviesState.query.isNullOrBlank() -> {
+            SearchState.SearchTyped(moviesState.query)
+        }
+        else -> {
+            SearchState.Icon
         }
     }
 
     Column {
 
         //Appbar
-        Appbar(searchState = searchState.value) {
-            searchState.value = SearchState.Typing()
-        }
+        Appbar(searchState = searchState, isIdle = moviesState.isIdleState(), onSearch = onSearch)
+
+        val movies = moviesState.movies
+
+        Timber.d("State: $moviesState")
 
         //Content
         when {
-            searchState.value is SearchState.Typing -> {
-                SearchScreen(hint = "Search Movies", onSearch = {
-                    searchState.value = SearchState.SearchTyped(it)
-                    onSearch(it)
-                })
-            }
-            moviesState.isIdleState() -> {
-                IdleScreen()
-            }
             moviesState.isLoading() -> {
                 LoadingScreen()
             }
             moviesState.isDetailState() && movieDetail != null -> {
                 DetailScreen(movieDetail)
-                searchState.value = SearchState.Detail(movieDetail.title)
+                //searchState.value = SearchState.Detail(movieDetail.title)
             }
-            moviesState.movies.isNotEmpty() -> {
-                ListScreen(moviesState.movies, onMovieClick)
-                searchState.value = SearchState.SearchTyped(moviesState.query)
+            movies.isNotEmpty() -> {
+                ListScreen(movies, onMovieClick)
+                //searchState.value = SearchState.SearchTyped(moviesState.query)
             }
             moviesState.error != null -> {
                 ErrorScreen(moviesState.error!!)
@@ -103,9 +96,11 @@ const val APPBAR_SEARCH_ICON_TAG = "searchIcon"
 
 
 @Composable
-fun Appbar(searchState: SearchState, onSearchTapped: () -> Unit) {
+fun Appbar(searchState: SearchState, isIdle: Boolean = false, onSearch: (String) -> Unit) {
+
+    val isSearchbarVisible = state { false }
+
     TopAppBar(Modifier.testTag("appbar")) {
-        val isSearchVisible = searchState !is SearchState.Detail
         ConstraintLayout(constraintSet = ConstraintSet {
             val title = tag(APPBAR_TITLE_TAG)
             val searchIcon = tag(APPBAR_SEARCH_ICON_TAG)
@@ -128,9 +123,19 @@ fun Appbar(searchState: SearchState, onSearchTapped: () -> Unit) {
             Image(
                 imageFromResource(ContextAmbient.current.resources, R.drawable.ic_search),
                 modifier = Modifier.tag(APPBAR_SEARCH_ICON_TAG).testTag(APPBAR_SEARCH_ICON_TAG)
-                    .clickable(onClick = onSearchTapped)
+                    .clickable(onClick = {
+                        isSearchbarVisible.value = true
+                    })
             )
         }
+    }
+    if (isSearchbarVisible.value) {
+        SearchScreen(hint = "Search Movies", onSearch = {
+            onSearch(it)
+            isSearchbarVisible.value = false
+        })
+    } else if (isIdle) {
+        IdleScreen()
     }
 }
 
@@ -341,7 +346,7 @@ fun loadingPreview() {
 @Composable
 @Preview
 fun appbarPreview() {
-    Appbar(searchState = SearchState.Icon, onSearchTapped = {})
+    Appbar(searchState = SearchState.Icon, onSearch = {})
 }
 
 @Composable

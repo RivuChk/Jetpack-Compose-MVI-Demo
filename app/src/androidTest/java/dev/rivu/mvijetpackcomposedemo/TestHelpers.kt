@@ -38,6 +38,6 @@ fun generateDummyMovieList(): List<Movie> =
             val random = Random(it).nextInt()
             Movie(
                 imdbID = "id-$random-$it",
-                title = "id-$random-$it"
+                title = "title-$random-$it"
             )
         }
