@@ -3,7 +3,6 @@ package dev.rivu.mvijetpackcomposedemo.moviesearch.ui
 import android.util.Log
 import androidx.compose.Composable
 import androidx.compose.getValue
-import androidx.compose.remember
 import androidx.compose.state
 import androidx.lifecycle.LiveData
 import androidx.ui.core.*
@@ -71,11 +70,9 @@ fun MoviesScreen(
             }
             moviesState.isDetailState() && movieDetail != null -> {
                 DetailScreen(movieDetail)
-                //searchState.value = SearchState.Detail(movieDetail.title)
             }
             movies.isNotEmpty() -> {
                 ListScreen(movies, onMovieClick)
-                //searchState.value = SearchState.SearchTyped(moviesState.query)
             }
             moviesState.error != null -> {
                 ErrorScreen(moviesState.error!!)
