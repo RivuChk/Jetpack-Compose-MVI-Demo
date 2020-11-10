@@ -1,28 +1,32 @@
 package dev.rivu.mvijetpackcomposedemo.moviesearch.ui
 
 import android.util.Log
-import androidx.compose.Composable
-import androidx.compose.getValue
-import androidx.compose.state
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumnItems
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawShadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.imageFromResource
+import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
-import androidx.ui.core.*
-import androidx.ui.foundation.*
-import androidx.ui.foundation.lazy.LazyColumnItems
-import androidx.ui.foundation.shape.corner.RoundedCornerShape
-import androidx.ui.graphics.Color
-import androidx.ui.graphics.imageFromResource
-import androidx.ui.input.TextFieldValue
-import androidx.ui.layout.*
-import androidx.ui.livedata.observeAsState
-import androidx.ui.material.Button
-import androidx.ui.material.Card
-import androidx.ui.material.CircularProgressIndicator
-import androidx.ui.material.TopAppBar
-import androidx.ui.text.TextStyle
-import androidx.ui.text.font.FontWeight
 import androidx.ui.tooling.preview.Preview
-import androidx.ui.unit.dp
-import androidx.ui.unit.sp
 import dev.rivu.mvijetpackcomposedemo.R
 import dev.rivu.mvijetpackcomposedemo.SEARCH_HINT
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
@@ -98,28 +102,26 @@ fun Appbar(searchState: SearchState, isIdle: Boolean = false, onSearch: (String)
     val isSearchbarVisible = state { false }
 
     TopAppBar(Modifier.testTag("appbar")) {
-        ConstraintLayout(constraintSet = ConstraintSet {
-            val title = tag(APPBAR_TITLE_TAG)
-            val searchIcon = tag(APPBAR_SEARCH_ICON_TAG)
+        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
 
-            title.apply {
-                top constrainTo parent.top
-                bottom constrainTo parent.bottom
-                left constrainTo parent.left
-                right constrainTo parent.right
-            }
+            val title = createRef()
+            val searchIcon = createRef()
 
-            searchIcon.apply {
-                top constrainTo parent.top
-                bottom constrainTo parent.bottom
-                right constrainTo parent.right
-            }
-        }, modifier = Modifier.fillMaxSize()) {
-            Text(text = searchState.titlebarText, modifier = Modifier.tag(APPBAR_TITLE_TAG))
+
+            Text(text = searchState.titlebarText, modifier = Modifier.constrainAs(title) {
+                top.linkTo(parent.top)
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            })
 
             Image(
                 imageFromResource(ContextAmbient.current.resources, R.drawable.ic_search),
-                modifier = Modifier.tag(APPBAR_SEARCH_ICON_TAG).testTag(APPBAR_SEARCH_ICON_TAG)
+                modifier = Modifier.constrainAs(searchIcon) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    end.linkTo(parent.end)
+                }.testTag(APPBAR_SEARCH_ICON_TAG)
                     .clickable(onClick = {
                         isSearchbarVisible.value = true
                     })
@@ -140,7 +142,7 @@ fun Appbar(searchState: SearchState, isIdle: Boolean = false, onSearch: (String)
 fun IdleScreen() {
     Column(
         verticalArrangement = Arrangement.Center,
-        horizontalGravity = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Tap on Search button to Search for Movies")
     }
@@ -149,66 +151,71 @@ fun IdleScreen() {
 @Composable
 fun DetailScreen(movieDetail: MovieDetail) {
     val loadPictureState = loadPicture(movieDetail.poster, R.drawable.cinema)
-    ConstraintLayout(constraintSet = ConstraintSet {
-        val logo = tag(ITEM_LOGO_TAG)
-        val itemTitle = tag(ITEM_TITLE_TAG)
-        val itemType = tag(ITEM_TYPE_TAG)
-        val itemYear = tag(ITEM_YEAR_TAG)
-        val itemImdb = tag(ITEM_IMDB_TAG)
-        val itemPlot = tag(ITEM_PLOT_TAG)
+    ConstraintLayout {
+        val logo = createRef()
+        val itemTitle = createRef()
+        val itemType = createRef()
+        val itemYear = createRef()
+        val itemImdb = createRef()
+        val itemPlot = createRef()
 
-        logo.apply {
-            left constrainTo parent.left
-            top constrainTo parent.top
-            right constrainTo parent.right
-        }
-
-        itemTitle.apply {
-            left constrainTo parent.left
-            top constrainTo logo.bottom
-        }
-
-        itemPlot.apply {
-            left constrainTo parent.left
-            top constrainTo itemTitle.bottom
-        }
-
-        itemImdb.apply {
-            left constrainTo parent.left
-            top constrainTo itemPlot.bottom
-        }
-
-        itemType.apply {
-            left constrainTo parent.left
-            top constrainTo itemImdb.bottom
-        }
-
-        itemYear.apply {
-            left constrainTo parent.left
-            top constrainTo itemType.bottom
-        }
-    }) {
         Image(
             loadPictureState.image,
-            modifier = Modifier.tag(ITEM_LOGO_TAG).fillMaxWidth().heightIn(maxHeight = 500.dp)
+            modifier = Modifier.constrainAs(logo) {
+                start.linkTo(parent.start)
+                top.linkTo(parent.top)
+                end.linkTo(parent.end)
+            }.fillMaxWidth()
+                .heightIn(max = 500.dp)
         )
         Text(
             text = movieDetail.title,
             color = Color.Blue,
             style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
-            modifier = Modifier.tag(ITEM_TITLE_TAG).padding(8.dp)
+            modifier = Modifier.constrainAs(itemTitle) {
+                start.linkTo(parent.start)
+                top.linkTo(logo.bottom)
+            }.padding(8.dp)
         )
-        Text(text = "Type: ${movieDetail.type.capitalize()}", style = TextStyle.Default.copy(fontSize = 15.sp), modifier = Modifier.tag(ITEM_TYPE_TAG).padding(5.dp))
-        Text(text = "Year: ${movieDetail.year}", style = TextStyle.Default.copy(fontSize = 15.sp), modifier = Modifier.tag(ITEM_YEAR_TAG).padding(5.dp))
-        Text(text = "IMDB: ${movieDetail.imdbID}", style = TextStyle.Default.copy(fontSize = 15.sp), modifier = Modifier.tag(ITEM_IMDB_TAG).padding(5.dp))
-        Text(text = "Plot: ${movieDetail.plot}", style = TextStyle.Default.copy(fontSize = 15.sp), modifier = Modifier.tag(ITEM_PLOT_TAG).padding(5.dp))
+        Text(
+            text = "Type: ${movieDetail.type.capitalize()}",
+            style = TextStyle.Default.copy(fontSize = 15.sp),
+            modifier = Modifier.constrainAs(itemType) {
+                start.linkTo(parent.start)
+                top.linkTo(itemImdb.bottom)
+            }.padding(5.dp)
+        )
+        Text(
+            text = "Year: ${movieDetail.year}",
+            style = TextStyle.Default.copy(fontSize = 15.sp),
+            modifier = Modifier.constrainAs(itemYear) {
+                start.linkTo(parent.start)
+                top.linkTo(itemType.bottom)
+            }.padding(5.dp)
+        )
+        Text(
+            text = "IMDB: ${movieDetail.imdbID}",
+            style = TextStyle.Default.copy(fontSize = 15.sp),
+            modifier = Modifier.constrainAs(itemImdb) {
+                start.linkTo(parent.start)
+                top.linkTo(itemPlot.bottom)
+            }.padding(5.dp)
+        )
+        Text(
+            text = "Plot: ${movieDetail.plot}",
+            style = TextStyle.Default.copy(fontSize = 15.sp),
+            modifier = Modifier.constrainAs(itemPlot) {
+                start.linkTo(parent.start)
+                top.linkTo(itemTitle.bottom)
+            }.padding(5.dp)
+        )
     }
 }
 
 @Composable
 fun ListScreen(movieList: List<Movie>, onMovieClick: (String) -> Unit) {
     LazyColumnItems(movieList, modifier = Modifier.testTag("movieList")) { movie ->
-        Box(modifier = Modifier.padding(5.dp).fillMaxWidth().heightIn(maxHeight = 150.dp).clickable(onClick = {
+        Box(modifier = Modifier.padding(5.dp).fillMaxWidth().heightIn(150.dp).clickable(onClick = {
             onMovieClick(movie.imdbID)
         })) {
             MovieItemCard(
@@ -223,59 +230,63 @@ fun MovieItemCard(modifier: Modifier = Modifier, movie: Movie) {
     Card(
         shape = RoundedCornerShape(8.dp),
         elevation = 7.dp,
-        modifier = modifier.wrapContentHeight(align = Alignment.CenterVertically).fillMaxWidth().drawShadow(2.dp)
+        modifier = modifier.wrapContentHeight(align = Alignment.CenterVertically).fillMaxWidth()
+            .drawShadow(2.dp)
     ) {
         val loadPictureState = loadPicture(movie.poster, R.drawable.cinema)
-        ConstraintLayout(constraintSet = ConstraintSet {
-            val logo = tag(ITEM_LOGO_TAG)
-            val itemTitle = tag(ITEM_TITLE_TAG)
-            val itemType = tag(ITEM_TYPE_TAG)
-            val itemYear = tag(ITEM_YEAR_TAG)
-            val itemImdb = tag(ITEM_IMDB_TAG)
+        ConstraintLayout {
+            val logo = createRef()
+            val itemTitle = createRef()
+            val itemType = createRef()
+            val itemYear = createRef()
+            val itemImdb = createRef()
 
-            logo.apply {
-                left constrainTo parent.left
-                top constrainTo parent.top
-            }
 
-            itemTitle.apply {
-                left constrainTo parent.left
-                top constrainTo logo.bottom
-                bottom constrainTo parent.bottom
-                right constrainTo parent.right
-            }
-
-            itemImdb.apply {
-                left constrainTo logo.right
-                top constrainTo parent.top
-                bottom constrainTo itemType.top
-            }
-
-            itemType.apply {
-                left constrainTo logo.right
-                top constrainTo itemImdb.bottom
-                bottom constrainTo itemYear.top
-            }
-
-            itemYear.apply {
-                left constrainTo logo.right
-                top constrainTo itemType.bottom
-                bottom constrainTo itemTitle.top
-            }
-        }) {
             Image(
                 loadPictureState.image,
-                modifier = Modifier.width(100.dp).height(100.dp).tag(ITEM_LOGO_TAG)
+                modifier = Modifier.width(100.dp).height(100.dp).constrainAs(logo) {
+                    start.linkTo(parent.start)
+                    top.linkTo(parent.top)
+                }
             )
             Text(
                 text = movie.title,
                 color = Color.Blue,
                 style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold),
-                modifier = Modifier.tag(ITEM_TITLE_TAG).padding(5.dp)
+                modifier = Modifier.padding(5.dp).constrainAs(itemTitle) {
+                    start.linkTo(parent.start)
+                    top.linkTo(logo.bottom)
+                    bottom.linkTo(parent.bottom)
+                    end.linkTo(parent.end)
+                }
             )
-            Text(text = "Type: ${movie.type.capitalize()}", style = TextStyle.Default.copy(fontSize = 10.sp), modifier = Modifier.tag(ITEM_TYPE_TAG).padding(2.dp))
-            Text(text = "Year: ${movie.year}", style = TextStyle.Default.copy(fontSize = 10.sp), modifier = Modifier.tag(ITEM_YEAR_TAG).padding(2.dp))
-            Text(text = "IMDB: ${movie.imdbID}", style = TextStyle.Default.copy(fontSize = 10.sp), modifier = Modifier.tag(ITEM_IMDB_TAG).padding(2.dp))
+            Text(
+                text = "Type: ${movie.type.capitalize()}",
+                style = TextStyle.Default.copy(fontSize = 10.sp),
+                modifier = Modifier.padding(2.dp).constrainAs(itemType) {
+                    start.linkTo(logo.end)
+                    top.linkTo(itemImdb.bottom)
+                    bottom.linkTo(itemYear.top)
+                }
+            )
+            Text(
+                text = "Year: ${movie.year}",
+                style = TextStyle.Default.copy(fontSize = 10.sp),
+                modifier = Modifier.padding(2.dp).constrainAs(itemYear) {
+                    start.linkTo(logo.end)
+                    top.linkTo(itemType.bottom)
+                    bottom.linkTo(itemTitle.top)
+                }
+            )
+            Text(
+                text = "IMDB: ${movie.imdbID}",
+                style = TextStyle.Default.copy(fontSize = 10.sp),
+                modifier = Modifier.padding(2.dp).constrainAs(itemImdb) {
+                    start.linkTo(logo.end)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(itemType.top)
+                }
+            )
         }
     }
 }
@@ -284,7 +295,7 @@ fun MovieItemCard(modifier: Modifier = Modifier, movie: Movie) {
 fun ErrorScreen(throwable: Throwable) {
     Column(
         verticalArrangement = Arrangement.Center,
-        horizontalGravity = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Error Showing Movies :: ${throwable.localizedMessage}")
     }
@@ -297,7 +308,7 @@ fun LoadingScreen() {
 
 @Composable
 fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
-    val typedText = state { TextFieldValue(hint) }
+    val typedText = state { TextFieldValue("") }
     Column {
         Row(modifier = Modifier.padding(5.dp)) {
             Text(text = "Enter Movie Name to Search")
@@ -305,15 +316,25 @@ fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
         Row {
             TextField(
                 value = typedText.value,
-                modifier = Modifier.fillMaxWidth().testTag("searchBar"),
-                onValueChange = {
-                    typedText.value = it
+                placeholder = @Composable {
+                    Text(text = hint)
                 },
-                onFocusChange = {
-                    if (it && typedText.value.text.equals(hint, ignoreCase = false)) {
-                        typedText.value = TextFieldValue("")
+                modifier = Modifier.fillMaxWidth().testTag("searchBar"),
+                imeAction = ImeAction.Search,
+                keyboardType = KeyboardType.Text,
+                onImeActionPerformed = { action, keyboardController ->
+                    if (action == ImeAction.Search) {
+                        keyboardController?.hideSoftwareKeyboard()
+                        onSearch(typedText.value.text)
                     }
-                })
+                },
+                onValueChange = { newTextValue ->
+                    typedText.value = newTextValue
+                },
+                onTextInputStarted = { keyboardController ->
+                    keyboardController.showSoftwareKeyboard()
+                }
+            )
         }
         Row(Modifier.fillMaxWidth().padding(5.dp)) {
             Column {

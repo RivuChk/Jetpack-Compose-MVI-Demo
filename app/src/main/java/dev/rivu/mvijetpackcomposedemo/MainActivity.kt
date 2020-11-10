@@ -3,9 +3,9 @@ package dev.rivu.mvijetpackcomposedemo
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.platform.setContent
 import androidx.lifecycle.Observer
-import androidx.ui.core.setContent
-import androidx.ui.material.MaterialTheme
 import dagger.hilt.android.AndroidEntryPoint
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MovieIntent
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MovieViewModel

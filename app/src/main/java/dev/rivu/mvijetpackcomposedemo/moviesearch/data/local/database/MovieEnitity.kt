@@ -3,7 +3,6 @@ package dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.serialization.Serializable
 
 @Entity(tableName = "movies")
 data class MovieEnitity(
@@ -39,7 +38,6 @@ data class MovieEnitity(
         val website: String = "", // N/A
         val writer: String = "" // Aaron Sorkin (screenplay), Ben Mezrich (book)
     ) {
-        @Serializable
         data class Rating(
             val source: String = "", // Metacritic
             val value: String = "" // 95/100

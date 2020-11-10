@@ -1,15 +1,14 @@
 package dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database
 
 import androidx.room.TypeConverter
-import kotlinx.serialization.builtins.list
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class Converters {
-    val json by lazy {
-        Json(JsonConfiguration.Stable)
-    }
 
+    val gson by lazy {
+        Gson()
+    }
 
     @TypeConverter
     fun fromListOfStringToString(list: List<String>): String {
@@ -23,11 +22,12 @@ class Converters {
 
     @TypeConverter
     fun fromListOfRatingToString(list: List<MovieEnitity.Detail.Rating>): String {
-        return json.stringify(MovieEnitity.Detail.Rating.serializer().list, list)
+        return gson.toJson(list)
     }
 
     @TypeConverter
     fun fromStringToListOfRating(str: String): List<MovieEnitity.Detail.Rating> {
-        return json.parse(MovieEnitity.Detail.Rating.serializer().list, str)
+        val listType = object: TypeToken<List<MovieEnitity.Detail.Rating>>() {}.type
+        return gson.fromJson(str, listType)
     }
 }
