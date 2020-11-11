@@ -17,7 +17,8 @@ import androidx.compose.ui.draw.drawShadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.imageFromResource
 import androidx.compose.ui.platform.ContextAmbient
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.accessibilityLabel
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -101,7 +102,7 @@ fun Appbar(searchState: SearchState, isIdle: Boolean = false, onSearch: (String)
 
     val isSearchbarVisible = state { false }
 
-    TopAppBar(Modifier.testTag("appbar")) {
+    TopAppBar(Modifier.semantics { accessibilityLabel = "appbar" }) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
 
             val title = createRef()
@@ -121,10 +122,9 @@ fun Appbar(searchState: SearchState, isIdle: Boolean = false, onSearch: (String)
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
                     end.linkTo(parent.end)
-                }.testTag(APPBAR_SEARCH_ICON_TAG)
-                    .clickable(onClick = {
-                        isSearchbarVisible.value = true
-                    })
+                }.clickable(onClick = {
+                    isSearchbarVisible.value = true
+                }).semantics { accessibilityLabel = APPBAR_SEARCH_ICON_TAG }
             )
         }
     }
@@ -214,7 +214,7 @@ fun DetailScreen(movieDetail: MovieDetail) {
 
 @Composable
 fun ListScreen(movieList: List<Movie>, onMovieClick: (String) -> Unit) {
-    LazyColumnItems(movieList, modifier = Modifier.testTag("movieList")) { movie ->
+    LazyColumnItems(movieList, modifier = Modifier.semantics { accessibilityLabel = "movieList" }) { movie ->
         Box(modifier = Modifier.padding(5.dp).fillMaxWidth().heightIn(150.dp).clickable(onClick = {
             onMovieClick(movie.imdbID)
         })) {
@@ -303,7 +303,7 @@ fun ErrorScreen(throwable: Throwable) {
 
 @Composable
 fun LoadingScreen() {
-    CircularProgressIndicator(Modifier.testTag("progressbar").fillMaxSize())
+    CircularProgressIndicator(Modifier.fillMaxSize().semantics { accessibilityLabel = "progressbar" })
 }
 
 @Composable
@@ -319,7 +319,7 @@ fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
                 placeholder = @Composable {
                     Text(text = hint)
                 },
-                modifier = Modifier.fillMaxWidth().testTag("searchBar"),
+                modifier = Modifier.fillMaxWidth().semantics { accessibilityLabel = "searchBar" },
                 imeAction = ImeAction.Search,
                 keyboardType = KeyboardType.Text,
                 onImeActionPerformed = { action, keyboardController ->
@@ -341,7 +341,7 @@ fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
                 Button(modifier = Modifier.padding(5.dp), onClick = {
                     onSearch(typedText.value.text)
                 }) {
-                    Text(text = "Search", modifier = Modifier.testTag("searchButton"))
+                    Text(text = "Search", modifier = Modifier.semantics { accessibilityLabel = "searchButton" })
                 }
             }
             Column {

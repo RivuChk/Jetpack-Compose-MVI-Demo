@@ -1,15 +1,16 @@
 package dev.rivu.mvijetpackcomposedemo
 
+import androidx.compose.animation.transitionsEnabled
+import androidx.compose.material.MaterialTheme
 import androidx.lifecycle.MutableLiveData
 import androidx.test.filters.MediumTest
-import androidx.ui.animation.transitionsEnabled
 import androidx.ui.test.*
-import androidx.ui.test.android.AndroidComposeTestRule
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MoviesState
 import dev.rivu.mvijetpackcomposedemo.moviesearch.ui.APPBAR_SEARCH_ICON_TAG
+import dev.rivu.mvijetpackcomposedemo.moviesearch.ui.MoviesScreen
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -21,7 +22,7 @@ import org.mockito.ArgumentMatchers.anyString
 @RunWith(JUnit4::class)
 class MovieAppUITests {
     @get:Rule
-    val composeTestRule = AndroidComposeTestRule<MainActivity>(null, false)
+    val composeTestRule = createComposeRule()
 
     val statesLiveData: MutableLiveData<MoviesState> by lazy {
         MutableLiveData<MoviesState>()
@@ -41,48 +42,49 @@ class MovieAppUITests {
                 .thenReturn(Unit)
         }
 
-        // Using targetContext as the Context of the instrumentation code
-        composeTestRule.launchMoviesApp(
-            statesLiveData,
-            mockOnSearch, mockOnMovieClick
-        )
+
+        composeTestRule.setContent {
+            MaterialTheme {
+                MoviesScreen(
+                    stateLiveData = statesLiveData,
+                    onSearch = mockOnSearch,
+                    onMovieClick = mockOnMovieClick
+                )
+            }
+        }
     }
 
     @Test
     fun app_launches() {
-        findByTag("appbar").assertIsDisplayed()
+        composeTestRule.onNode(hasLabel("appbar")).assertIsDisplayed()
     }
 
     @Test
     fun test_idle_state() {
         statesLiveData.postValue(MoviesState.initialState())
-        findByTag(APPBAR_SEARCH_ICON_TAG).assertIsDisplayed()
+        composeTestRule.onNode(hasLabel(APPBAR_SEARCH_ICON_TAG)).assertIsDisplayed()
     }
 
     @Test
     fun test_search_action() {
         val searchQuery = "jack"
         statesLiveData.postValue(MoviesState.initialState())
-        val searchIcon = findByTag(APPBAR_SEARCH_ICON_TAG)
+        val searchIcon = composeTestRule.onNode(hasLabel(APPBAR_SEARCH_ICON_TAG))
 
-        searchIcon.doClick()
-        findByTag("searchBar").doClearText(false)
-        findByTag("searchBar").doSendText(searchQuery, false)
+        searchIcon.performClick()
+        composeTestRule.onNode(hasLabel("searchBar")).performTextClearance(false)
+        composeTestRule.onNode(hasLabel("searchBar")).performTextInput(searchQuery, false)
 
-        findByTag("searchButton").doClick()
+        composeTestRule.onNode(hasLabel("searchButton")).performClick()
 
         verify(mockOnSearch).invoke(searchQuery)
     }
 
     @Test
     fun test_loading_state() {
-        composeTestRule.activityRule.scenario.onActivity {
-            it.runOnUiThread {
-                transitionsEnabled = false
-                statesLiveData.setValue(MoviesState.initialState().copy(isLoading = true))
-            }
-        }
-        findByTag("progressbar").assertExists()
+        composeTestRule.clockTestRule.pauseClock()
+        statesLiveData.postValue(MoviesState.initialState().copy(isLoading = true))
+        composeTestRule.onNode(hasLabel("progressbar")).assertExists()
     }
 
     @Test
@@ -95,6 +97,6 @@ class MovieAppUITests {
         //test first and last items are displayed
         val firstMovie = movieList.first()
 
-        findBySubstring(text = firstMovie.title, ignoreCase = true).assertIsDisplayed()
+        composeTestRule.onNode(hasSubstring(substring = firstMovie.title, ignoreCase = true)).assertIsDisplayed()
     }
 }
