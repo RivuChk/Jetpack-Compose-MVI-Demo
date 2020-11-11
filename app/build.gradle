@@ -108,7 +108,6 @@ dependencies {
   implementation "androidx.compose.foundation:foundation:$compose_version"
   implementation "androidx.compose.ui:ui:$compose_version"
   implementation "androidx.ui:ui-tooling:$compose_version"
-  implementation "androidx.ui:ui-test:$compose_version"
 
   implementation "androidx.compose.material:material:$compose_version"
 
@@ -157,7 +156,6 @@ dependencies {
   testImplementation("junit:junit:4.13")
   androidTestImplementation("androidx.test:rules:1.2.0")
   androidTestImplementation("androidx.test:runner:1.2.0")
-  androidTestImplementation("androidx.ui:ui-core:$compose_version")
   androidTestImplementation("androidx.ui:ui-test:$compose_version")
 
   //Room DB
