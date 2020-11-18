@@ -2,15 +2,22 @@ package dev.rivu.mvijetpackcomposedemo.moviesearch.ui
 
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumnItems
+import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.TextField
+import androidx.compose.material.Button
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawShadow
@@ -19,6 +26,7 @@ import androidx.compose.ui.graphics.imageFromResource
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.semantics.accessibilityLabel
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -38,7 +46,6 @@ import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.isIdleState
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.isLoading
 import timber.log.Timber
 
-@OptIn(ExperimentalStdlibApi::class)
 @Composable
 fun MoviesScreen(
     stateLiveData: LiveData<MoviesState>,
@@ -51,7 +58,7 @@ fun MoviesScreen(
         moviesState.isDetailState() && movieDetail != null -> {
             SearchState.Detail(movieDetail.title)
         }
-        !moviesState.query.isNullOrBlank() -> {
+        !moviesState.query.isBlank() -> {
             SearchState.SearchTyped(moviesState.query)
         }
         else -> {
@@ -86,21 +93,13 @@ fun MoviesScreen(
     }
 }
 
-const val ITEM_LOGO_TAG = "item_logo"
-const val ITEM_TITLE_TAG = "item_title"
-const val ITEM_IMDB_TAG = "item_imdb"
-const val ITEM_YEAR_TAG = "item_year"
-const val ITEM_TYPE_TAG = "item_type"
-const val ITEM_PLOT_TAG = "item_plot"
-
-const val APPBAR_TITLE_TAG = "appbar_title"
 const val APPBAR_SEARCH_ICON_TAG = "searchIcon"
 
 
 @Composable
 fun Appbar(searchState: SearchState, isIdle: Boolean = false, onSearch: (String) -> Unit) {
 
-    val isSearchbarVisible = state { false }
+    val isSearchbarVisible = remember { mutableStateOf(false) }
 
     TopAppBar(Modifier.semantics { accessibilityLabel = "appbar" }) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
@@ -214,7 +213,7 @@ fun DetailScreen(movieDetail: MovieDetail) {
 
 @Composable
 fun ListScreen(movieList: List<Movie>, onMovieClick: (String) -> Unit) {
-    LazyColumnItems(movieList, modifier = Modifier.semantics { accessibilityLabel = "movieList" }) { movie ->
+    LazyColumnFor(movieList, modifier = Modifier.semantics { accessibilityLabel = "movieList" }) { movie ->
         Box(modifier = Modifier.padding(5.dp).fillMaxWidth().heightIn(150.dp).clickable(onClick = {
             onMovieClick(movie.imdbID)
         })) {
@@ -308,7 +307,7 @@ fun LoadingScreen() {
 
 @Composable
 fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
-    val typedText = state { TextFieldValue("") }
+    val typedText = remember { mutableStateOf( TextFieldValue("")) }
     Column {
         Row(modifier = Modifier.padding(5.dp)) {
             Text(text = "Enter Movie Name to Search")
@@ -316,20 +315,23 @@ fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
         Row {
             TextField(
                 value = typedText.value,
+                onValueChange = { newTextValue: TextFieldValue ->
+                    typedText.value = newTextValue
+                },
                 placeholder = @Composable {
                     Text(text = hint)
                 },
                 modifier = Modifier.fillMaxWidth().semantics { accessibilityLabel = "searchBar" },
-                imeAction = ImeAction.Search,
-                keyboardType = KeyboardType.Text,
-                onImeActionPerformed = { action, keyboardController ->
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Search
+                ),
+                onImeActionPerformed = { action:ImeAction, keyboardController: SoftwareKeyboardController? ->
                     if (action == ImeAction.Search) {
                         keyboardController?.hideSoftwareKeyboard()
                         onSearch(typedText.value.text)
                     }
-                },
-                onValueChange = { newTextValue ->
-                    typedText.value = newTextValue
                 },
                 onTextInputStarted = { keyboardController ->
                     keyboardController.showSoftwareKeyboard()

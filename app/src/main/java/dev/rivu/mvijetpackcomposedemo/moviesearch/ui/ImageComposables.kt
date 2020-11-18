@@ -3,10 +3,7 @@ package dev.rivu.mvijetpackcomposedemo.moviesearch.ui
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.state
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.graphics.imageFromResource
@@ -21,7 +18,7 @@ fun loadPicture(url: String, @DrawableRes placeholderRes: Int, @DrawableRes erro
     val placeHolderImage = imageFromResource(ContextAmbient.current.resources, placeholderRes)
     val errorImage = if (errorImageRes == placeholderRes) placeHolderImage else imageFromResource(ContextAmbient.current.resources, errorImageRes)
 
-    var bitmapState: ImageState by state<ImageState> { ImageState.Loading(placeHolderImage) }
+    var bitmapState: ImageState by remember { mutableStateOf(ImageState.Loading(placeHolderImage)) }
 
     Glide.with(ContextAmbient.current)
         .asBitmap()

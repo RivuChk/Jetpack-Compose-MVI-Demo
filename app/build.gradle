@@ -82,8 +82,8 @@ android {
     exclude("META-INF/LICENSE-FIREBASE.txt")
     exclude("META-INF/DEPENDENCIES.txt")
     exclude("META-INF/rxkotlin.properties")
-    exclude("META-INF/app_ByjusPremiumRelease.kotlin_module")
-    exclude("META-INF/app_ByjusPremiumDebug.kotlin_module")
+    exclude("META-INF/AL2.0")
+    exclude("META-INF/LGPL2.1")
   }
 }
 
