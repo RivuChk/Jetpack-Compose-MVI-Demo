@@ -13,11 +13,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.TextField
 import androidx.compose.material.Button
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawShadow
@@ -36,6 +33,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
 import androidx.ui.tooling.preview.Preview
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieAnimationSpec
+import com.airbnb.lottie.compose.LottieAnimationState
+import com.airbnb.lottie.compose.rememberLottieAnimationState
 import dev.rivu.mvijetpackcomposedemo.R
 import dev.rivu.mvijetpackcomposedemo.SEARCH_HINT
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
@@ -52,49 +53,96 @@ fun MoviesScreen(
     onSearch: (String) -> Unit,
     onMovieClick: (String) -> Unit
 ) {
-    val moviesState: MoviesState by stateLiveData.observeAsState(MoviesState.initialState())
-    val movieDetail = moviesState.detail
-    val searchState = when {
-        moviesState.isDetailState() && movieDetail != null -> {
-            SearchState.Detail(movieDetail.title)
-        }
-        !moviesState.query.isBlank() -> {
-            SearchState.SearchTyped(moviesState.query)
-        }
-        else -> {
-            SearchState.Icon
-        }
-    }
 
-    Column {
+    val isSplashPlaying = remember { mutableStateOf(true) }
 
-        //Appbar
-        Appbar(searchState = searchState, isIdle = moviesState.isIdleState(), onSearch = onSearch)
+    if (isSplashPlaying.value) {
+        Splash(isSplashPlaying)
+    } else {
 
-        val movies = moviesState.movies
-
-        Timber.d("State: $moviesState")
-
-        //Content
-        when {
-            moviesState.isLoading() -> {
-                LoadingScreen()
-            }
+        val moviesState: MoviesState by stateLiveData.observeAsState(MoviesState.initialState())
+        val movieDetail = moviesState.detail
+        val searchState = when {
             moviesState.isDetailState() && movieDetail != null -> {
-                DetailScreen(movieDetail)
+                SearchState.Detail(movieDetail.title)
             }
-            movies.isNotEmpty() -> {
-                ListScreen(movies, onMovieClick)
+            !moviesState.query.isBlank() -> {
+                SearchState.SearchTyped(moviesState.query)
             }
-            moviesState.error != null -> {
-                ErrorScreen(moviesState.error!!)
+            else -> {
+                SearchState.Icon
+            }
+        }
+
+        Column {
+
+            //Appbar
+            Appbar(
+                searchState = searchState,
+                isIdle = moviesState.isIdleState(),
+                onSearch = onSearch
+            )
+
+            val movies = moviesState.movies
+
+            Timber.d("State: $moviesState")
+
+            //Content
+            when {
+                moviesState.isLoading() -> {
+                    LoadingScreen()
+                }
+                moviesState.isDetailState() && movieDetail != null -> {
+                    DetailScreen(movieDetail)
+                }
+                movies.isNotEmpty() -> {
+                    ListScreen(movies, onMovieClick)
+                }
+                moviesState.error != null -> {
+                    ErrorScreen(moviesState.error!!)
+                }
             }
         }
     }
+
 }
 
 const val APPBAR_SEARCH_ICON_TAG = "searchIcon"
 
+@Composable
+fun Splash(
+    isPlaying: MutableState<Boolean> = remember { mutableStateOf(false) }
+) {
+    val animationSpec = remember { LottieAnimationSpec.RawRes(R.raw.splash_animation_jetpack) }
+    val animationState: LottieAnimationState =
+        rememberLottieAnimationState(autoPlay = true, repeatCount = 0)
+
+    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+        val lottie = createRef()
+        val credit = createRef()
+
+
+        LottieAnimation(
+            animationSpec,
+            modifier = Modifier.preferredSize(100.dp).constrainAs(lottie) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                top.linkTo(parent.top)
+                bottom.linkTo(parent.bottom)
+            },
+            animationState = animationState
+        )
+
+        Text(text = "Lottie from: https://lottiefiles.com/29328-android-jetpack", fontSize = 8.sp, modifier = Modifier.constrainAs(credit) {
+            start.linkTo(parent.start)
+            end.linkTo(parent.end)
+            top.linkTo(lottie.bottom)
+            bottom.linkTo(parent.bottom)
+        })
+    }
+
+    isPlaying.value = animationState.progress < 1f
+}
 
 @Composable
 fun Appbar(searchState: SearchState, isIdle: Boolean = false, onSearch: (String) -> Unit) {
@@ -213,7 +261,9 @@ fun DetailScreen(movieDetail: MovieDetail) {
 
 @Composable
 fun ListScreen(movieList: List<Movie>, onMovieClick: (String) -> Unit) {
-    LazyColumnFor(movieList, modifier = Modifier.semantics { accessibilityLabel = "movieList" }) { movie ->
+    LazyColumnFor(
+        movieList,
+        modifier = Modifier.semantics { accessibilityLabel = "movieList" }) { movie ->
         Box(modifier = Modifier.padding(5.dp).fillMaxWidth().heightIn(150.dp).clickable(onClick = {
             onMovieClick(movie.imdbID)
         })) {
@@ -302,12 +352,13 @@ fun ErrorScreen(throwable: Throwable) {
 
 @Composable
 fun LoadingScreen() {
-    CircularProgressIndicator(Modifier.fillMaxSize().semantics { accessibilityLabel = "progressbar" })
+    CircularProgressIndicator(
+        Modifier.fillMaxSize().semantics { accessibilityLabel = "progressbar" })
 }
 
 @Composable
 fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
-    val typedText = remember { mutableStateOf( TextFieldValue("")) }
+    val typedText = remember { mutableStateOf(TextFieldValue("")) }
     Column {
         Row(modifier = Modifier.padding(5.dp)) {
             Text(text = "Enter Movie Name to Search")
@@ -327,7 +378,7 @@ fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Search
                 ),
-                onImeActionPerformed = { action:ImeAction, keyboardController: SoftwareKeyboardController? ->
+                onImeActionPerformed = { action: ImeAction, keyboardController: SoftwareKeyboardController? ->
                     if (action == ImeAction.Search) {
                         keyboardController?.hideSoftwareKeyboard()
                         onSearch(typedText.value.text)
@@ -343,7 +394,9 @@ fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
                 Button(modifier = Modifier.padding(5.dp), onClick = {
                     onSearch(typedText.value.text)
                 }) {
-                    Text(text = "Search", modifier = Modifier.semantics { accessibilityLabel = "searchButton" })
+                    Text(
+                        text = "Search",
+                        modifier = Modifier.semantics { accessibilityLabel = "searchButton" })
                 }
             }
             Column {

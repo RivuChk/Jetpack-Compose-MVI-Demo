@@ -142,6 +142,8 @@ dependencies {
   // assertion
   testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
 
+  implementation "com.airbnb.android:lottie-compose:1.0.0-alpha03"
+
   // spek2
   testImplementation "org.spekframework.spek2:spek-dsl-jvm:$spek_version"
   testImplementation "org.spekframework.spek2:spek-runner-junit5:$spek_version"
