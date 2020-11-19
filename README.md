@@ -4,7 +4,7 @@ The goal of this project is to have a demo application using popular MVI Arch pa
 **We will keep this project updated with latest releases of Jetpack Compose.**
 - Current Jetpack Compose Version - *alpha-07*
 
-![Here's a demo of the app](composable-demo.gif)
+![Here's a demo of the app](composable-demo-2.gif)
 
 ## Technologies / Frameworks Used
 - Spek + JUnit5 for Unit Tests / Specification Testing
