@@ -1,4 +1,4 @@
-import androidx.room.EmptyResultSetException
+import androidx.room.rxjava3.EmptyResultSetException
 import com.nhaarman.mockitokotlin2.*
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.MovieDataStore
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.MovieRepository

@@ -12,11 +12,10 @@ The goal of this project is to have a demo application using popular MVI Arch pa
 - Lottie for Splash Animation
 - Dagger HILT for DI (Migrated from Koin in this commit: [21a9db64bee1359bd57cf99ba757467da63f10b2](https://github.com/RivuChk/Jetpack-Compose-MVI-Demo/commit/21a9db64bee1359bd57cf99ba757467da63f10b2))
 - RxJava 3 for Streams
-- Room for DB (With RxJava 2)
-- RxBridge, to convert Rx2 Streams (from Room) to Rx3
+- Room for DB (With RxJava 3)
 - Mockito for mocking
-- LiveData for emiting states from ViewModel
-- `LazyColumnItems` from Compose for showing List
+- LiveData for emitting states from ViewModel
+- `LazyColumnFor` from Compose for showing List
 - *Glide* for image loading with Composable `Image`
 - Composable `ConstraintLayout`
 - Composable `TopAppBar`

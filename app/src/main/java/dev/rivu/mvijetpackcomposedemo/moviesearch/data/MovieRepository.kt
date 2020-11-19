@@ -1,6 +1,6 @@
 package dev.rivu.mvijetpackcomposedemo.moviesearch.data
 
-import androidx.room.EmptyResultSetException
+import androidx.room.rxjava3.EmptyResultSetException
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.MovieDetail
 import io.reactivex.rxjava3.core.Completable

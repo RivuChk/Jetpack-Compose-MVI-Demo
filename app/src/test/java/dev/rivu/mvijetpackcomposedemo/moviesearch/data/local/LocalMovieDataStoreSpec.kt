@@ -1,4 +1,4 @@
-import androidx.room.EmptyResultSetException
+import androidx.room.rxjava3.EmptyResultSetException
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
@@ -12,9 +12,9 @@ import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.MovieDao
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.MovieEnitity
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.MovieDetail
-import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 import org.mockito.ArgumentMatchers.anyList
 import org.mockito.ArgumentMatchers.anyString
 import org.spekframework.spek2.Spek
