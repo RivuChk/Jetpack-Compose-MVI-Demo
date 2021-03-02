@@ -31,13 +31,14 @@ class MovieViewModel @ViewModelInject constructor(
             is MovieIntent.SearchIntent -> MovieAction.SearchAction(intent.query)
             is MovieIntent.ClickIntent -> MovieAction.DetailAction(intent.imdbId)
             is MovieIntent.ClearClickIntent -> MovieAction.ClearDetailAction
+            is MovieIntent.SaveSearchHistory -> MovieAction.SaveSearchHistory(intent.searchHistory)
         }
     }
 
     override fun reducer(): BiFunction<MoviesState, MovieResult, MoviesState> =
         BiFunction { previousState, result ->
             when (result) {
-                is MovieResult.InitResult -> previousState
+                is MovieResult.InitResult -> previousState.copy(searchHistory = result.searchHistory)
                 is MovieResult.SearchResult.InProgress -> previousState.copy(
                     query = result.query,
                     isLoading = true
@@ -69,6 +70,7 @@ class MovieViewModel @ViewModelInject constructor(
                 is MovieResult.ClearDetailResult -> previousState.copy(
                     detail = null
                 )
+                is MovieResult.SaveSearchResult -> previousState
             }
         }
 

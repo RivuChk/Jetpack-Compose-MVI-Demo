@@ -13,6 +13,7 @@ import dev.rivu.mvijetpackcomposedemo.moviesearch.data.MovieRepository
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.LocalMovieDataStore
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.MovieDB
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.MovieDao
+import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.SearchDao
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.remote.MovieApi
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.remote.MovieApiFactory
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.remote.RemoteMovieDataStore
@@ -26,7 +27,7 @@ object DataModule {
 
     @Provides
     @Named("local")
-    fun provideLocalMovieDataStore(dao: MovieDao): MovieDataStore = LocalMovieDataStore(dao)
+    fun provideLocalMovieDataStore(movieDao: MovieDao, searchDao: SearchDao): MovieDataStore = LocalMovieDataStore(movieDao, searchDao)
 
 
     @Provides
@@ -58,6 +59,10 @@ object AppDataModule {
     @Provides
     @Singleton
     fun provideMovieDao(db: MovieDB): MovieDao = db.movieDao()
+
+    @Provides
+    @Singleton
+    fun provideSearchDao(db: MovieDB): SearchDao = db.searchDao()
 
 
 }

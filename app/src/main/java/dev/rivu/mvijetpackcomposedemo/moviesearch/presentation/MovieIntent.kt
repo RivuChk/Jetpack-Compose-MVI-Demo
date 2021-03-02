@@ -7,4 +7,5 @@ sealed class MovieIntent : MviIntent {
     data class SearchIntent(val query: String) : MovieIntent()
     data class ClickIntent(val imdbId: String) : MovieIntent()
     object ClearClickIntent : MovieIntent()
+    data class SaveSearchHistory(val searchHistory: List<String>) : MovieIntent()
 }

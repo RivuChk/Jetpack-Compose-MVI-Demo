@@ -16,4 +16,10 @@ interface MovieDataStore {
     fun getMovieDetail(imdbId: String): Single<MovieDetail>
 
     fun addMovieDetail(movie: MovieDetail): Completable
+
+    fun saveSearchHistory(list: List<String>): Completable
+
+    fun saveSearchHistory(currentSearch: String): Completable
+
+    fun getSearchHistory(): Single<List<String>>
 }

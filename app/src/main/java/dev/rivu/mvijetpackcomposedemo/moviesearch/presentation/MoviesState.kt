@@ -10,7 +10,8 @@ data class MoviesState(
     val movies: List<Movie> = listOf(),
     val error: Throwable? = null,
     val isLoading: Boolean = false,
-    val detail: MovieDetail? = null
+    val detail: MovieDetail? = null,
+    val searchHistory: List<String> = emptyList()
 ) : MviState {
     companion object {
         fun initialState(): MoviesState = MoviesState()

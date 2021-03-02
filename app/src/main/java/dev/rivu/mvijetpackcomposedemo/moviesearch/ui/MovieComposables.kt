@@ -1,42 +1,41 @@
 package dev.rivu.mvijetpackcomposedemo.moviesearch.ui
 
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.TextField
-import androidx.compose.material.Button
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawShadow
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.imageFromResource
-import androidx.compose.ui.platform.ContextAmbient
-import androidx.compose.ui.semantics.accessibilityLabel
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.SoftwareKeyboardController
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.LiveData
-import androidx.ui.tooling.preview.Preview
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieAnimationSpec
 import com.airbnb.lottie.compose.LottieAnimationState
 import com.airbnb.lottie.compose.rememberLottieAnimationState
+import dev.chrisbanes.accompanist.coil.CoilImage
 import dev.rivu.mvijetpackcomposedemo.R
 import dev.rivu.mvijetpackcomposedemo.SEARCH_HINT
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
@@ -101,6 +100,9 @@ fun MoviesScreen(
                 moviesState.error != null -> {
                     ErrorScreen(moviesState.error!!)
                 }
+                else -> {
+                    IdleScreen(searchHistory = moviesState.searchHistory, onSearch = onSearch)
+                }
             }
         }
     }
@@ -114,8 +116,7 @@ fun Splash(
     isPlaying: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val animationSpec = remember { LottieAnimationSpec.RawRes(R.raw.splash_animation_jetpack) }
-    val animationState: LottieAnimationState =
-        rememberLottieAnimationState(autoPlay = true, repeatCount = 0)
+    val animationState: LottieAnimationState = rememberLottieAnimationState(autoPlay = true, repeatCount = 0)
 
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val lottie = createRef()
@@ -124,21 +125,24 @@ fun Splash(
 
         LottieAnimation(
             animationSpec,
-            modifier = Modifier.preferredSize(100.dp).constrainAs(lottie) {
+            modifier = Modifier.constrainAs(lottie) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 top.linkTo(parent.top)
                 bottom.linkTo(parent.bottom)
-            },
+            }.size(100.dp),
             animationState = animationState
         )
 
-        Text(text = "Lottie from: https://lottiefiles.com/29328-android-jetpack", fontSize = 8.sp, modifier = Modifier.constrainAs(credit) {
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-            top.linkTo(lottie.bottom)
-            bottom.linkTo(parent.bottom)
-        })
+        Text(
+            text = "Lottie from: https://lottiefiles.com/29328-android-jetpack",
+            fontSize = 8.sp,
+            modifier = Modifier.constrainAs(credit) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                top.linkTo(lottie.bottom)
+                bottom.linkTo(parent.bottom)
+            })
     }
 
     isPlaying.value = animationState.progress < 1f
@@ -149,7 +153,7 @@ fun Appbar(searchState: SearchState, isIdle: Boolean = false, onSearch: (String)
 
     val isSearchbarVisible = remember { mutableStateOf(false) }
 
-    TopAppBar(Modifier.semantics { accessibilityLabel = "appbar" }) {
+    TopAppBar(Modifier.semantics { testTag = "appbar" }) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
 
             val title = createRef()
@@ -164,14 +168,15 @@ fun Appbar(searchState: SearchState, isIdle: Boolean = false, onSearch: (String)
             })
 
             Image(
-                imageFromResource(ContextAmbient.current.resources, R.drawable.ic_search),
+                painterResource(R.drawable.ic_search),
+                contentDescription = "Search",
                 modifier = Modifier.constrainAs(searchIcon) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
                     end.linkTo(parent.end)
                 }.clickable(onClick = {
                     isSearchbarVisible.value = true
-                }).semantics { accessibilityLabel = APPBAR_SEARCH_ICON_TAG }
+                }).semantics { testTag = APPBAR_SEARCH_ICON_TAG }
             )
         }
     }
@@ -180,24 +185,48 @@ fun Appbar(searchState: SearchState, isIdle: Boolean = false, onSearch: (String)
             onSearch(it)
             isSearchbarVisible.value = false
         })
-    } else if (isIdle) {
-        IdleScreen()
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun IdleScreen() {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Tap on Search button to Search for Movies")
+fun IdleScreen(searchHistory: List<String>, onSearch: (String) -> Unit = {}) {
+    Column {
+        Row {
+            Text("Tap on Search button to Search for Movies")
+        }
+
+        if (searchHistory.isNotEmpty()) {
+            Row(Modifier.padding(top = 5.dp)) {
+                Text("Below are your past searches")
+            }
+
+            LazyVerticalGrid(cells = GridCells.Fixed(3)) {
+                items(searchHistory) { item ->
+                    Column(modifier = Modifier.padding(5.dp)) {
+                        Box(
+                            modifier = Modifier
+                                .border(width = 1.dp, color = Color.Gray, shape = RoundedCornerShape(5.dp))
+                                .background(color = Color.Red, shape = RoundedCornerShape(5.dp))
+                                .padding(5.dp)
+                                .clickable {
+                                    onSearch(item)
+                                }
+                        ) {
+                            Text(
+                                text = item,
+                                color = Color.White
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
 fun DetailScreen(movieDetail: MovieDetail) {
-    val loadPictureState = loadPicture(movieDetail.poster, R.drawable.cinema)
     ConstraintLayout {
         val logo = createRef()
         val itemTitle = createRef()
@@ -206,8 +235,16 @@ fun DetailScreen(movieDetail: MovieDetail) {
         val itemImdb = createRef()
         val itemPlot = createRef()
 
-        Image(
-            loadPictureState.image,
+        CoilImage(
+            data = movieDetail.poster,
+            contentDescription = movieDetail.title + " poster",
+            fadeIn = true,
+            loading = {
+                Image(
+                    painter = painterResource(id = R.drawable.cinema),
+                    contentDescription = "loading"
+                )
+            },
             modifier = Modifier.constrainAs(logo) {
                 start.linkTo(parent.start)
                 top.linkTo(parent.top)
@@ -215,6 +252,7 @@ fun DetailScreen(movieDetail: MovieDetail) {
             }.fillMaxWidth()
                 .heightIn(max = 500.dp)
         )
+
         Text(
             text = movieDetail.title,
             color = Color.Blue,
@@ -259,17 +297,24 @@ fun DetailScreen(movieDetail: MovieDetail) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListScreen(movieList: List<Movie>, onMovieClick: (String) -> Unit) {
-    LazyColumnFor(
-        movieList,
-        modifier = Modifier.semantics { accessibilityLabel = "movieList" }) { movie ->
-        Box(modifier = Modifier.padding(5.dp).fillMaxWidth().heightIn(150.dp).clickable(onClick = {
-            onMovieClick(movie.imdbID)
-        })) {
-            MovieItemCard(
-                movie = movie
-            )
+    LazyVerticalGrid(
+        modifier = Modifier.semantics { testTag = "movieList" },
+        cells = GridCells.Fixed(2)
+    ) {
+        items(movieList) { movie ->
+            Box(
+                modifier = Modifier.padding(5.dp).fillMaxWidth().height(150.dp)
+                    .clickable(onClick = {
+                        onMovieClick(movie.imdbID)
+                    })
+            ) {
+                MovieItemCard(
+                    movie = movie
+                )
+            }
         }
     }
 }
@@ -280,9 +325,8 @@ fun MovieItemCard(modifier: Modifier = Modifier, movie: Movie) {
         shape = RoundedCornerShape(8.dp),
         elevation = 7.dp,
         modifier = modifier.wrapContentHeight(align = Alignment.CenterVertically).fillMaxWidth()
-            .drawShadow(2.dp)
+            .shadow(2.dp)
     ) {
-        val loadPictureState = loadPicture(movie.poster, R.drawable.cinema)
         ConstraintLayout {
             val logo = createRef()
             val itemTitle = createRef()
@@ -291,13 +335,22 @@ fun MovieItemCard(modifier: Modifier = Modifier, movie: Movie) {
             val itemImdb = createRef()
 
 
-            Image(
-                loadPictureState.image,
+            CoilImage(
+                data = movie.poster,
+                contentDescription = movie.title + " poster",
+                fadeIn = true,
+                loading = {
+                    Image(
+                        painter = painterResource(id = R.drawable.cinema),
+                        contentDescription = "loading"
+                    )
+                },
                 modifier = Modifier.width(100.dp).height(100.dp).constrainAs(logo) {
                     start.linkTo(parent.start)
                     top.linkTo(parent.top)
                 }
             )
+
             Text(
                 text = movie.title,
                 color = Color.Blue,
@@ -353,9 +406,10 @@ fun ErrorScreen(throwable: Throwable) {
 @Composable
 fun LoadingScreen() {
     CircularProgressIndicator(
-        Modifier.fillMaxSize().semantics { accessibilityLabel = "progressbar" })
+        Modifier.fillMaxSize().semantics { testTag = "progressbar" })
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
     val typedText = remember { mutableStateOf(TextFieldValue("")) }
@@ -369,23 +423,17 @@ fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
                 onValueChange = { newTextValue: TextFieldValue ->
                     typedText.value = newTextValue
                 },
-                placeholder = @Composable {
-                    Text(text = hint)
-                },
-                modifier = Modifier.fillMaxWidth().semantics { accessibilityLabel = "searchBar" },
+                modifier = Modifier.fillMaxWidth().semantics { testTag = "searchBar" },
                 maxLines = 1,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Search
                 ),
-                onImeActionPerformed = { action: ImeAction, keyboardController: SoftwareKeyboardController? ->
-                    if (action == ImeAction.Search) {
-                        keyboardController?.hideSoftwareKeyboard()
-                        onSearch(typedText.value.text)
-                    }
+                placeholder = @Composable {
+                    Text(text = hint)
                 },
-                onTextInputStarted = { keyboardController ->
-                    keyboardController.showSoftwareKeyboard()
+                keyboardActions = KeyboardActions {
+                    onSearch(typedText.value.text)
                 }
             )
         }
@@ -396,7 +444,7 @@ fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
                 }) {
                     Text(
                         text = "Search",
-                        modifier = Modifier.semantics { accessibilityLabel = "searchButton" })
+                        modifier = Modifier.semantics { testTag = "searchButton" })
                 }
             }
             Column {

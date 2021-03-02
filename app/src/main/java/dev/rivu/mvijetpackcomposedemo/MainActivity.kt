@@ -1,10 +1,10 @@
 package dev.rivu.mvijetpackcomposedemo
 
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
-import androidx.compose.ui.platform.setContent
 import androidx.lifecycle.Observer
 import dagger.hilt.android.AndroidEntryPoint
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MovieIntent
@@ -66,6 +66,9 @@ class MainActivity : AppCompatActivity() {
         if (state != null && state.isDetailState()) {
             clearClickPublisher.onNext(MovieIntent.ClearClickIntent)
         } else {
+            if (state?.query != null && searchHistory.contains(state.query)) {
+                searchHistory.remove(state.query)
+            }
             val pastSearch = searchHistory.removeLastOrNull()
             if (pastSearch != null) {
                 searchWithoutHistory(pastSearch)

@@ -4,13 +4,15 @@ import androidx.room.rxjava3.EmptyResultSetException
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.MovieDataStore
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.MovieDao
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.MovieEnitity
+import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.SearchDao
+import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.SearchHistoryEntity
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.MovieDetail
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 
-class LocalMovieDataStore(private val movieDao: MovieDao) : MovieDataStore {
+class LocalMovieDataStore(private val movieDao: MovieDao, private val searchDao: SearchDao) : MovieDataStore {
 
     override fun getMoviesStream(searchQuery: String): Flowable<List<Movie>> {
         return movieDao.getMoviesStream(searchQuery)
@@ -136,5 +138,28 @@ class LocalMovieDataStore(private val movieDao: MovieDao) : MovieDataStore {
                 )
             )
         )
+    }
+
+    override fun saveSearchHistory(list: List<String>): Completable {
+        return searchDao.addSearchHistory(
+            list.map {
+                SearchHistoryEntity(it, System.currentTimeMillis().toString())
+            }
+        )
+    }
+
+    override fun saveSearchHistory(currentSearch: String): Completable {
+        return searchDao.addSearchHistory(
+            listOf(SearchHistoryEntity(currentSearch, System.currentTimeMillis().toString()))
+        )
+    }
+
+    override fun getSearchHistory(): Single<List<String>> {
+        return searchDao.getSearchHistory()
+            .map {
+                it.map {
+                    it.searchTerm
+                }
+            }
     }
 }

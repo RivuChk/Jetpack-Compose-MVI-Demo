@@ -10,4 +10,5 @@ sealed class MovieAction : MviAction {
     data class DetailAction(val imdbId: String) : MovieAction()
 
     object ClearDetailAction : MovieAction()
+    data class SaveSearchHistory(val searchHistory: List<String>) : MovieAction()
 }

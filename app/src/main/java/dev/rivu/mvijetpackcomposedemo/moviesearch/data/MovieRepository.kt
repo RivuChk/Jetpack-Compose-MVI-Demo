@@ -32,6 +32,7 @@ class MovieRepository(
             .flatMap { movies ->
                 if (movies.isNotEmpty()) {
                     addMovies(movies)
+                        .andThen(localDataStore.saveSearchHistory(searchQuery))
                         .andThen(
                             Single.just(movies)
                         )
@@ -66,5 +67,13 @@ class MovieRepository(
                     }
                     .toFlowable()
             }
+    }
+
+    override fun saveSearchResult(list: List<String>): Completable {
+        return localDataStore.saveSearchHistory(list = list)
+    }
+
+    override fun getSearchHistory(): Single<List<String>> {
+        return localDataStore.getSearchHistory()
     }
 }

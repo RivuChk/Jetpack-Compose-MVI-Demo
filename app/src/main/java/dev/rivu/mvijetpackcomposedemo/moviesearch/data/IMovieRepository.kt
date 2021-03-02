@@ -14,4 +14,8 @@ interface IMovieRepository {
     fun syncMovieSearchResult(searchQuery: String): Single<List<Movie>>
 
     fun getMovieDetail(imdbId: String): Flowable<MovieDetail>
+
+    fun saveSearchResult(list: List<String>): Completable
+
+    fun getSearchHistory(): Single<List<String>>
 }

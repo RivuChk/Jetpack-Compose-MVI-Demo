@@ -81,10 +81,42 @@ open class MovieProcessor(
             }
         }
 
+    private fun saveSearchDetails(): FlowableTransformer<MovieAction.SaveSearchHistory, MovieResult.SaveSearchResult> =
+        FlowableTransformer {
+            it.switchMap { action ->
+                repository.saveSearchResult(action.searchHistory)
+                    .andThen(
+                        Flowable.just(MovieResult.SaveSearchResult.Success)
+                    )
+                    .cast(MovieResult.SaveSearchResult::class.java)
+                    .onErrorReturn { error ->
+                        MovieResult.SaveSearchResult.Error
+                    }
+                    .subscribeOn(schedulerProvider.io())
+                    .observeOn(schedulerProvider.ui())
+                    .startWithItem(
+                        MovieResult.SaveSearchResult.Loading
+                    )
+            }
+        }
+
     private fun initUi(): FlowableTransformer<MovieAction.InitAction, MovieResult.InitResult> =
         FlowableTransformer {
             it.switchMap {
-                Flowable.just(MovieResult.InitResult)
+                repository.getSearchHistory()
+                    .toFlowable()
+                    .map { searchHistory ->
+                        MovieResult.InitResult(searchHistory)
+                    }
+                    .cast(MovieResult.InitResult::class.java)
+                    .onErrorReturn { error ->
+                        MovieResult.InitResult()
+                    }
+                    .subscribeOn(schedulerProvider.io())
+                    .observeOn(schedulerProvider.ui())
+                    .startWithItem(
+                        MovieResult.InitResult()
+                    )
             }
         }
 }

@@ -28,5 +28,11 @@ sealed class MovieResult : MviResult {
 
     object ClearDetailResult : MovieResult()
 
-    object InitResult : MovieResult()
+    data class InitResult(val searchHistory: List<String> = emptyList()) : MovieResult()
+
+    sealed class SaveSearchResult : MovieResult() {
+        object Loading : SaveSearchResult()
+        object Success : SaveSearchResult()
+        object Error : SaveSearchResult()
+    }
 }
