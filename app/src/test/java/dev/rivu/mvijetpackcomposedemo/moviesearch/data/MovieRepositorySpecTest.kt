@@ -50,6 +50,12 @@ class MovieRepositorySpecTest : Spek({
                 whenever(localDataStore.addMovies(anyList<Movie>()))
                     .thenReturn(Completable.complete())
 
+                whenever(localDataStore.saveSearchHistory(anyList()))
+                    .thenReturn(Completable.complete())
+
+                whenever(localDataStore.saveSearchHistory(anyString()))
+                    .thenReturn(Completable.complete())
+
                 whenever(remoteDataStore.getMovies(anyString()))
                     .thenReturn(Single.just(dummyData))
             }
@@ -93,6 +99,12 @@ class MovieRepositorySpecTest : Spek({
                 whenever(localDataStore.addMovies(anyList()))
                     .thenReturn(Completable.complete())
 
+                whenever(localDataStore.saveSearchHistory(anyList()))
+                    .thenReturn(Completable.complete())
+
+                whenever(localDataStore.saveSearchHistory(anyString()))
+                    .thenReturn(Completable.complete())
+
                 whenever(remoteDataStore.getMovies(anyString()))
                     .thenReturn(Single.just(dummyRemoteData))
             }
@@ -117,6 +129,12 @@ class MovieRepositorySpecTest : Spek({
                 whenever(localDataStore.addMovies(dummyData))
                     .thenReturn(Completable.complete())
 
+                whenever(localDataStore.saveSearchHistory(anyList()))
+                    .thenReturn(Completable.complete())
+
+                whenever(localDataStore.saveSearchHistory(anyString()))
+                    .thenReturn(Completable.complete())
+
                 whenever(remoteDataStore.getMovies(anyString()))
                     .thenReturn(Single.just(dummyData))
             }
@@ -137,6 +155,12 @@ class MovieRepositorySpecTest : Spek({
             beforeEachGroup {
                 whenever(localDataStore.addMovies(anyList()))
                     .thenReturn(Completable.complete())
+
+                whenever(localDataStore.saveSearchHistory(anyList()))
+                    .thenReturn(Completable.complete())
+
+                whenever(localDataStore.saveSearchHistory(anyString()))
+                    .thenReturn(Completable.complete())
             }
 
             it("should complete") {
@@ -152,6 +176,12 @@ class MovieRepositorySpecTest : Spek({
             beforeEachGroup {
                 whenever(localDataStore.addMovies(anyList()))
                     .thenReturn(Completable.error(error))
+
+                whenever(localDataStore.saveSearchHistory(anyList()))
+                    .thenReturn(Completable.complete())
+
+                whenever(localDataStore.saveSearchHistory(anyString()))
+                    .thenReturn(Completable.complete())
             }
 
             it("should emit same error") {

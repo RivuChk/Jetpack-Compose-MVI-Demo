@@ -1,10 +1,10 @@
 package dev.rivu.mvijetpackcomposedemo
 
-import androidx.compose.animation.transitionsEnabled
 import androidx.compose.material.MaterialTheme
 import androidx.lifecycle.MutableLiveData
 import androidx.test.filters.MediumTest
-import androidx.ui.test.*
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createComposeRule
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -56,35 +56,34 @@ class MovieAppUITests {
 
     @Test
     fun app_launches() {
-        composeTestRule.onNode(hasLabel("appbar")).assertIsDisplayed()
+        composeTestRule.onNode(hasTestTag("appbar")).assertIsDisplayed()
     }
 
     @Test
     fun test_idle_state() {
         statesLiveData.postValue(MoviesState.initialState())
-        composeTestRule.onNode(hasLabel(APPBAR_SEARCH_ICON_TAG)).assertIsDisplayed()
+        composeTestRule.onNode(hasTestTag(APPBAR_SEARCH_ICON_TAG)).assertIsDisplayed()
     }
 
     @Test
     fun test_search_action() {
         val searchQuery = "jack"
         statesLiveData.postValue(MoviesState.initialState())
-        val searchIcon = composeTestRule.onNode(hasLabel(APPBAR_SEARCH_ICON_TAG))
+        val searchIcon = composeTestRule.onNode(hasTestTag(APPBAR_SEARCH_ICON_TAG))
 
         searchIcon.performClick()
-        composeTestRule.onNode(hasLabel("searchBar")).performTextClearance(false)
-        composeTestRule.onNode(hasLabel("searchBar")).performTextInput(searchQuery, false)
+        composeTestRule.onNode(hasTestTag("searchBar")).performTextClearance()
+        composeTestRule.onNode(hasTestTag("searchBar")).performTextInput(searchQuery)
 
-        composeTestRule.onNode(hasLabel("searchButton")).performClick()
+        composeTestRule.onNode(hasTestTag("searchButton")).performClick()
 
         verify(mockOnSearch).invoke(searchQuery)
     }
 
     @Test
     fun test_loading_state() {
-        composeTestRule.clockTestRule.pauseClock()
         statesLiveData.postValue(MoviesState.initialState().copy(isLoading = true))
-        composeTestRule.onNode(hasLabel("progressbar")).assertExists()
+        composeTestRule.onNode(hasTestTag("progressbar")).assertExists()
     }
 
     @Test
@@ -97,6 +96,6 @@ class MovieAppUITests {
         //test first and last items are displayed
         val firstMovie = movieList.first()
 
-        composeTestRule.onNode(hasSubstring(substring = firstMovie.title, ignoreCase = true)).assertIsDisplayed()
+        composeTestRule.onNode(hasText(text = firstMovie.title, substring = true, ignoreCase = true)).assertIsDisplayed()
     }
 }

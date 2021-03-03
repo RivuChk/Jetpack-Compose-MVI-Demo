@@ -2,9 +2,9 @@
 # Jetpack Compose + MVI
 The goal of this project is to have a demo application using popular MVI Arch pattern in android, while using Jetpack Compose for UI. This project shows how less-complicated the whole codebase and testing becomes just by using Jetpack Compose.
 **We will keep this project updated with latest releases of Jetpack Compose.**
-- Current Jetpack Compose Version - *alpha-07*
+- Current Jetpack Compose Version - *beta-01*
 
-![Here's a demo of the app](composable-demo-2.gif)
+![Here's a demo of the app](compose-demo-new.gif)
 
 ## Technologies / Frameworks Used
 - Spek + JUnit5 for Unit Tests / Specification Testing
@@ -15,8 +15,8 @@ The goal of this project is to have a demo application using popular MVI Arch pa
 - Room for DB (With RxJava 3)
 - Mockito for mocking
 - LiveData for emitting states from ViewModel
-- `LazyColumnFor` from Compose for showing List
-- *Glide* for image loading with Composable `Image`
+- `LazyColumn` and `LazyVerticalGrid` from Compose for showing List/Grid
+- ~~*Glide* for image loading with Composable `Image`~~ Coil, along with Accompanist for Image loading
 - Composable `ConstraintLayout`
 - Composable `TopAppBar`
 - Bitrise and Github Actions for CI

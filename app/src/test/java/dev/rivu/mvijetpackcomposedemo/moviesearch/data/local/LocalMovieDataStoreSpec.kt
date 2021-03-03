@@ -10,6 +10,7 @@ import dev.rivu.mvijetpackcomposedemo.moviesearch.data.datafactory.getDummyMovie
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.LocalMovieDataStore
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.MovieDao
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.MovieEnitity
+import dev.rivu.mvijetpackcomposedemo.moviesearch.data.local.database.SearchDao
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.MovieDetail
 import io.reactivex.rxjava3.core.Completable
@@ -24,8 +25,9 @@ import org.spekframework.spek2.style.specification.describe
 class LocalMovieDataStoreSpec : Spek({
 
     val mockDao: MovieDao = mock()
+    val searchDao: SearchDao = mock()
     val localDataStore: LocalMovieDataStore by memoized {
-        LocalMovieDataStore(mockDao)
+        LocalMovieDataStore(mockDao, searchDao)
     }
 
     describe("#${LocalMovieDataStore::getMoviesStream.name}") {

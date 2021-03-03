@@ -1,12 +1,6 @@
 package dev.rivu.mvijetpackcomposedemo
 
-import android.content.Context
-import androidx.compose.material.MaterialTheme
-import androidx.lifecycle.LiveData
-import androidx.ui.test.ComposeTestRule
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
-import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MoviesState
-import dev.rivu.mvijetpackcomposedemo.moviesearch.ui.MoviesScreen
 import kotlin.random.Random
 
 /**
