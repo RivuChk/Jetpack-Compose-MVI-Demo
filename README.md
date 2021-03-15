@@ -2,7 +2,7 @@
 # Jetpack Compose + MVI
 The goal of this project is to have a demo application using popular MVI Arch pattern in android, while using Jetpack Compose for UI. This project shows how less-complicated the whole codebase and testing becomes just by using Jetpack Compose.
 **We will keep this project updated with latest releases of Jetpack Compose.**
-- Current Jetpack Compose Version - *beta-01*
+- Current Jetpack Compose Version - *beta-02*
 
 ![Here's a demo of the app](compose-demo-new.gif)
 
