@@ -2,7 +2,7 @@
 # Jetpack Compose + MVI
 The goal of this project is to have a demo application using popular MVI Arch pattern in android, while using Jetpack Compose for UI. This project shows how less-complicated the whole codebase and testing becomes just by using Jetpack Compose.
 **We will keep this project updated with latest releases of Jetpack Compose.**
-- Current Jetpack Compose Version - *beta-03*
+- Current Jetpack Compose Version - *1.1.1*
 
 ![Here's a demo of the app](compose-demo-new.gif)
 
@@ -16,7 +16,7 @@ The goal of this project is to have a demo application using popular MVI Arch pa
 - Mockito for mocking
 - LiveData for emitting states from ViewModel
 - `LazyColumn` and `LazyVerticalGrid` from Compose for showing List/Grid
-- ~~*Glide* for image loading with Composable `Image`~~ Coil, along with Accompanist for Image loading
+- **Coil** for Image loading
 - Composable `ConstraintLayout`
 - Composable `TopAppBar`
 - Bitrise and Github Actions for CI

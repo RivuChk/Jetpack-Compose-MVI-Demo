@@ -1,6 +1,8 @@
 package dev.rivu.mvijetpackcomposedemo
 
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +13,7 @@ import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MovieIntent
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.MovieViewModel
 import dev.rivu.mvijetpackcomposedemo.moviesearch.presentation.isDetailState
 import dev.rivu.mvijetpackcomposedemo.moviesearch.ui.MoviesScreen
+import dev.rivu.mvijetpackcomposedemo.moviesearch.ui.MoviesTheme
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import timber.log.Timber
@@ -34,7 +37,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            MoviesTheme {
                 MoviesScreen(liveData, ::search, ::click)
             }
         }

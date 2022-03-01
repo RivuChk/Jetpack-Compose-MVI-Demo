@@ -30,11 +30,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.LiveData
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieAnimationSpec
-import com.airbnb.lottie.compose.LottieAnimationState
-import com.airbnb.lottie.compose.rememberLottieAnimationState
-import dev.chrisbanes.accompanist.coil.CoilImage
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.rememberImagePainter
+import coil.transition.CrossfadeTransition
+import com.airbnb.lottie.compose.*
 import dev.rivu.mvijetpackcomposedemo.R
 import dev.rivu.mvijetpackcomposedemo.SEARCH_HINT
 import dev.rivu.mvijetpackcomposedemo.moviesearch.data.model.Movie
@@ -114,8 +113,8 @@ const val APPBAR_SEARCH_ICON_TAG = "searchIcon"
 fun Splash(
     isPlaying: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
-    val animationSpec = remember { LottieAnimationSpec.RawRes(R.raw.splash_animation_jetpack) }
-    val animationState: LottieAnimationState = rememberLottieAnimationState(autoPlay = true, repeatCount = 0)
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash_animation_jetpack))
+    val progress by animateLottieCompositionAsState(composition)
 
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val lottie = createRef()
@@ -123,14 +122,16 @@ fun Splash(
 
 
         LottieAnimation(
-            animationSpec,
-            modifier = Modifier.constrainAs(lottie) {
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-            }.size(100.dp),
-            animationState = animationState
+            composition,
+            progress,
+            modifier = Modifier
+                .constrainAs(lottie) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }
+                .size(100.dp)
         )
 
         Text(
@@ -144,7 +145,7 @@ fun Splash(
             })
     }
 
-    isPlaying.value = animationState.progress < 1f
+    isPlaying.value = progress < 1f
 }
 
 @Composable
@@ -169,13 +170,16 @@ fun Appbar(searchState: SearchState, isIdle: Boolean = false, onSearch: (String)
             Image(
                 painterResource(R.drawable.ic_search),
                 contentDescription = "Search",
-                modifier = Modifier.constrainAs(searchIcon) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    end.linkTo(parent.end)
-                }.clickable(onClick = {
-                    isSearchbarVisible.value = true
-                }).semantics { testTag = APPBAR_SEARCH_ICON_TAG }
+                modifier = Modifier
+                    .constrainAs(searchIcon) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(parent.end)
+                    }
+                    .clickable(onClick = {
+                        isSearchbarVisible.value = true
+                    })
+                    .semantics { testTag = APPBAR_SEARCH_ICON_TAG }
             )
         }
     }
@@ -205,7 +209,11 @@ fun IdleScreen(searchHistory: List<String>, onSearch: (String) -> Unit = {}) {
                     Column(modifier = Modifier.padding(5.dp)) {
                         Box(
                             modifier = Modifier
-                                .border(width = 1.dp, color = Color.Gray, shape = RoundedCornerShape(5.dp))
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Gray,
+                                    shape = RoundedCornerShape(5.dp)
+                                )
                                 .background(color = Color.Red, shape = RoundedCornerShape(5.dp))
                                 .padding(5.dp)
                                 .clickable {
@@ -224,6 +232,7 @@ fun IdleScreen(searchHistory: List<String>, onSearch: (String) -> Unit = {}) {
     }
 }
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun DetailScreen(movieDetail: MovieDetail) {
     ConstraintLayout {
@@ -234,21 +243,22 @@ fun DetailScreen(movieDetail: MovieDetail) {
         val itemImdb = createRef()
         val itemPlot = createRef()
 
-        CoilImage(
-            data = movieDetail.poster,
+        Image(
+            painter = rememberImagePainter(
+                data = movieDetail.poster,
+                builder = {
+                    transition(CrossfadeTransition())
+                    placeholder(R.drawable.cinema)
+                }
+            ),
             contentDescription = movieDetail.title + " poster",
-            fadeIn = true,
-            loading = {
-                Image(
-                    painter = painterResource(id = R.drawable.cinema),
-                    contentDescription = "loading"
-                )
-            },
-            modifier = Modifier.constrainAs(logo) {
-                start.linkTo(parent.start)
-                top.linkTo(parent.top)
-                end.linkTo(parent.end)
-            }.fillMaxWidth()
+            modifier = Modifier
+                .constrainAs(logo) {
+                    start.linkTo(parent.start)
+                    top.linkTo(parent.top)
+                    end.linkTo(parent.end)
+                }
+                .fillMaxWidth()
                 .heightIn(max = 500.dp)
         )
 
@@ -256,42 +266,52 @@ fun DetailScreen(movieDetail: MovieDetail) {
             text = movieDetail.title,
             color = Color.Blue,
             style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
-            modifier = Modifier.constrainAs(itemTitle) {
-                start.linkTo(parent.start)
-                top.linkTo(logo.bottom)
-            }.padding(8.dp)
+            modifier = Modifier
+                .constrainAs(itemTitle) {
+                    start.linkTo(parent.start)
+                    top.linkTo(logo.bottom)
+                }
+                .padding(8.dp)
         )
         Text(
             text = "Type: ${movieDetail.type.capitalize()}",
             style = TextStyle.Default.copy(fontSize = 15.sp),
-            modifier = Modifier.constrainAs(itemType) {
-                start.linkTo(parent.start)
-                top.linkTo(itemImdb.bottom)
-            }.padding(5.dp)
+            modifier = Modifier
+                .constrainAs(itemType) {
+                    start.linkTo(parent.start)
+                    top.linkTo(itemImdb.bottom)
+                }
+                .padding(5.dp)
         )
         Text(
             text = "Year: ${movieDetail.year}",
             style = TextStyle.Default.copy(fontSize = 15.sp),
-            modifier = Modifier.constrainAs(itemYear) {
-                start.linkTo(parent.start)
-                top.linkTo(itemType.bottom)
-            }.padding(5.dp)
+            modifier = Modifier
+                .constrainAs(itemYear) {
+                    start.linkTo(parent.start)
+                    top.linkTo(itemType.bottom)
+                }
+                .padding(5.dp)
         )
         Text(
             text = "IMDB: ${movieDetail.imdbID}",
             style = TextStyle.Default.copy(fontSize = 15.sp),
-            modifier = Modifier.constrainAs(itemImdb) {
-                start.linkTo(parent.start)
-                top.linkTo(itemPlot.bottom)
-            }.padding(5.dp)
+            modifier = Modifier
+                .constrainAs(itemImdb) {
+                    start.linkTo(parent.start)
+                    top.linkTo(itemPlot.bottom)
+                }
+                .padding(5.dp)
         )
         Text(
             text = "Plot: ${movieDetail.plot}",
             style = TextStyle.Default.copy(fontSize = 15.sp),
-            modifier = Modifier.constrainAs(itemPlot) {
-                start.linkTo(parent.start)
-                top.linkTo(itemTitle.bottom)
-            }.padding(5.dp)
+            modifier = Modifier
+                .constrainAs(itemPlot) {
+                    start.linkTo(parent.start)
+                    top.linkTo(itemTitle.bottom)
+                }
+                .padding(5.dp)
         )
     }
 }
@@ -305,7 +325,10 @@ fun ListScreen(movieList: List<Movie>, onMovieClick: (String) -> Unit) {
     ) {
         items(movieList) { movie ->
             Box(
-                modifier = Modifier.padding(5.dp).fillMaxWidth().height(150.dp)
+                modifier = Modifier
+                    .padding(5.dp)
+                    .fillMaxWidth()
+                    .height(150.dp)
                     .clickable(onClick = {
                         onMovieClick(movie.imdbID)
                     })
@@ -318,12 +341,15 @@ fun ListScreen(movieList: List<Movie>, onMovieClick: (String) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun MovieItemCard(modifier: Modifier = Modifier, movie: Movie) {
     Card(
         shape = RoundedCornerShape(8.dp),
         elevation = 7.dp,
-        modifier = modifier.wrapContentHeight(align = Alignment.CenterVertically).fillMaxWidth()
+        modifier = modifier
+            .wrapContentHeight(align = Alignment.CenterVertically)
+            .fillMaxWidth()
             .shadow(2.dp)
     ) {
         ConstraintLayout {
@@ -334,59 +360,69 @@ fun MovieItemCard(modifier: Modifier = Modifier, movie: Movie) {
             val itemImdb = createRef()
 
 
-            CoilImage(
-                data = movie.poster,
+            Image(
+                painter = rememberImagePainter(
+                    data = movie.poster,
+                    builder = {
+                        transition(CrossfadeTransition())
+                        placeholder(R.drawable.cinema)
+                    }
+                ),
                 contentDescription = movie.title + " poster",
-                fadeIn = true,
-                loading = {
-                    Image(
-                        painter = painterResource(id = R.drawable.cinema),
-                        contentDescription = "loading"
-                    )
-                },
-                modifier = Modifier.width(100.dp).height(100.dp).constrainAs(logo) {
-                    start.linkTo(parent.start)
-                    top.linkTo(parent.top)
-                }
+                modifier = Modifier
+                    .width(100.dp)
+                    .height(100.dp)
+                    .constrainAs(logo) {
+                        start.linkTo(parent.start)
+                        top.linkTo(parent.top)
+                    }
             )
 
             Text(
                 text = movie.title,
                 color = Color.Blue,
                 style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(5.dp).constrainAs(itemTitle) {
-                    start.linkTo(parent.start)
-                    top.linkTo(logo.bottom)
-                    bottom.linkTo(parent.bottom)
-                    end.linkTo(parent.end)
-                }
+                modifier = Modifier
+                    .padding(5.dp)
+                    .constrainAs(itemTitle) {
+                        start.linkTo(parent.start)
+                        top.linkTo(logo.bottom)
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(parent.end)
+                    }
             )
             Text(
                 text = "Type: ${movie.type.capitalize()}",
                 style = TextStyle.Default.copy(fontSize = 10.sp),
-                modifier = Modifier.padding(2.dp).constrainAs(itemType) {
-                    start.linkTo(logo.end)
-                    top.linkTo(itemImdb.bottom)
-                    bottom.linkTo(itemYear.top)
-                }
+                modifier = Modifier
+                    .padding(2.dp)
+                    .constrainAs(itemType) {
+                        start.linkTo(logo.end)
+                        top.linkTo(itemImdb.bottom)
+                        bottom.linkTo(itemYear.top)
+                    }
             )
             Text(
                 text = "Year: ${movie.year}",
                 style = TextStyle.Default.copy(fontSize = 10.sp),
-                modifier = Modifier.padding(2.dp).constrainAs(itemYear) {
-                    start.linkTo(logo.end)
-                    top.linkTo(itemType.bottom)
-                    bottom.linkTo(itemTitle.top)
-                }
+                modifier = Modifier
+                    .padding(2.dp)
+                    .constrainAs(itemYear) {
+                        start.linkTo(logo.end)
+                        top.linkTo(itemType.bottom)
+                        bottom.linkTo(itemTitle.top)
+                    }
             )
             Text(
                 text = "IMDB: ${movie.imdbID}",
                 style = TextStyle.Default.copy(fontSize = 10.sp),
-                modifier = Modifier.padding(2.dp).constrainAs(itemImdb) {
-                    start.linkTo(logo.end)
-                    top.linkTo(parent.top)
-                    bottom.linkTo(itemType.top)
-                }
+                modifier = Modifier
+                    .padding(2.dp)
+                    .constrainAs(itemImdb) {
+                        start.linkTo(logo.end)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(itemType.top)
+                    }
             )
         }
     }
@@ -405,7 +441,9 @@ fun ErrorScreen(throwable: Throwable) {
 @Composable
 fun LoadingScreen() {
     CircularProgressIndicator(
-        Modifier.fillMaxSize().semantics { testTag = "progressbar" })
+        Modifier
+            .fillMaxSize()
+            .semantics { testTag = "progressbar" })
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -422,7 +460,9 @@ fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
                 onValueChange = { newTextValue: TextFieldValue ->
                     typedText.value = newTextValue
                 },
-                modifier = Modifier.fillMaxWidth().semantics { testTag = "searchBar" },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { testTag = "searchBar" },
                 maxLines = 1,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -436,7 +476,10 @@ fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
                 }
             )
         }
-        Row(Modifier.fillMaxWidth().padding(5.dp)) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(5.dp)) {
             Column {
                 Button(modifier = Modifier.padding(5.dp), onClick = {
                     onSearch(typedText.value.text)

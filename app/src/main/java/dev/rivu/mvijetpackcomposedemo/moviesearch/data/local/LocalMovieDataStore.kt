@@ -71,31 +71,31 @@ class LocalMovieDataStore(private val movieDao: MovieDao, private val searchDao:
                         type = it.type,
                         year = it.year,
 
-                        response = it.detail.response,
-                        actors = it.detail.actors,
-                        awards = it.detail.awards,
-                        boxOffice = it.detail.boxOffice,
-                        country = it.detail.country,
-                        dVD = it.detail.dVD,
-                        director = it.detail.director,
-                        genre = it.detail.genre,
-                        imdbRating = it.detail.imdbRating,
-                        imdbVotes = it.detail.imdbVotes,
-                        language = it.detail.language,
-                        metascore = it.detail.metascore,
-                        plot = it.detail.plot,
-                        production = it.detail.production,
-                        rated = it.detail.rated,
-                        ratings = it.detail.ratings.map {
+                        response = it.detail!!.response,
+                        actors = it.detail!!.actors,
+                        awards = it.detail!!.awards,
+                        boxOffice = it.detail!!.boxOffice,
+                        country = it.detail!!.country,
+                        dVD = it.detail!!.dVD,
+                        director = it.detail!!.director,
+                        genre = it.detail!!.genre,
+                        imdbRating = it.detail!!.imdbRating,
+                        imdbVotes = it.detail!!.imdbVotes,
+                        language = it.detail!!.language,
+                        metascore = it.detail!!.metascore,
+                        plot = it.detail!!.plot,
+                        production = it.detail!!.production,
+                        rated = it.detail!!.rated,
+                        ratings = it.detail!!.ratings.map { rating ->
                             MovieDetail.Rating(
-                                source = it.source,
-                                value = it.value
+                                source = rating.source,
+                                value = rating.value
                             )
                         },
-                        released = it.detail.released,
-                        runtime = it.detail.runtime,
-                        website = it.detail.website,
-                        writer = it.detail.writer
+                        released = it.detail!!.released,
+                        runtime = it.detail!!.runtime,
+                        website = it.detail!!.website,
+                        writer = it.detail!!.writer
                     )
                 }
             }
