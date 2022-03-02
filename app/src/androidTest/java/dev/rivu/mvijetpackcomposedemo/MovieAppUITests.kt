@@ -55,40 +55,40 @@ class MovieAppUITests {
     }
 
     @Test
-    fun app_launches() {
-        composeTestRule.onNode(hasTestTag("appbar")).assertIsDisplayed()
+    fun splashPlays() {
+        composeTestRule.onNode(hasTestTag("splash")).assertIsDisplayed()
     }
 
     @Test
     fun test_idle_state() {
-        statesLiveData.postValue(MoviesState.initialState())
+        statesLiveData.postValue(MoviesState.initialState().copy(skipSplash = true))
         composeTestRule.onNode(hasTestTag(APPBAR_SEARCH_ICON_TAG)).assertIsDisplayed()
     }
 
     @Test
     fun test_search_action() {
         val searchQuery = "jack"
-        statesLiveData.postValue(MoviesState.initialState())
+        statesLiveData.postValue(MoviesState.initialState().copy(skipSplash = true))
         val searchIcon = composeTestRule.onNode(hasTestTag(APPBAR_SEARCH_ICON_TAG))
 
         searchIcon.performClick()
         composeTestRule.onNode(hasTestTag("searchBar")).performTextClearance()
         composeTestRule.onNode(hasTestTag("searchBar")).performTextInput(searchQuery)
 
-        composeTestRule.onNode(hasTestTag("searchButton")).performClick()
+        composeTestRule.onNode(hasTestTag("searchBar")).performImeAction()
 
         verify(mockOnSearch).invoke(searchQuery)
     }
 
     @Test
     fun test_loading_state() {
-        statesLiveData.postValue(MoviesState.initialState().copy(isLoading = true))
+        statesLiveData.postValue(MoviesState.initialState().copy(isLoading = true, skipSplash = true))
         composeTestRule.onNode(hasTestTag("progressbar")).assertExists()
     }
 
     @Test
     fun test_list_state() {
-        val initialState = MoviesState.initialState()
+        val initialState = MoviesState.initialState().copy(skipSplash = true)
         val movieList = generateDummyMovieList()
 
         statesLiveData.postValue(initialState.copy(movies = movieList))

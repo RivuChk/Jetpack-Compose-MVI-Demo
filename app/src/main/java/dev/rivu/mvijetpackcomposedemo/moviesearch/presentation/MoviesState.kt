@@ -11,7 +11,8 @@ data class MoviesState(
     val error: Throwable? = null,
     val isLoading: Boolean = false,
     val detail: MovieDetail? = null,
-    val searchHistory: List<String> = emptyList()
+    val searchHistory: List<String> = emptyList(),
+    val skipSplash: Boolean = false
 ) : MviState {
     companion object {
         fun initialState(): MoviesState = MoviesState()

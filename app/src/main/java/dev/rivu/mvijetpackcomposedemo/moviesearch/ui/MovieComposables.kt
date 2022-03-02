@@ -53,11 +53,11 @@ fun MoviesScreen(
 
     val isSplashPlaying = remember { mutableStateOf(true) }
 
-    if (isSplashPlaying.value) {
+    val moviesState: MoviesState by stateLiveData.observeAsState(MoviesState.initialState())
+
+    if (isSplashPlaying.value && !moviesState.skipSplash) {
         Splash(isSplashPlaying)
     } else {
-
-        val moviesState: MoviesState by stateLiveData.observeAsState(MoviesState.initialState())
         val movieDetail = moviesState.detail
         val searchState = when {
             moviesState.isDetailState() && movieDetail != null -> {
@@ -116,7 +116,7 @@ fun Splash(
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash_animation_jetpack))
     val progress by animateLottieCompositionAsState(composition)
 
-    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+    ConstraintLayout(modifier = Modifier.fillMaxSize().semantics { testTag = "splash" }) {
         val lottie = createRef()
         val credit = createRef()
 
@@ -486,7 +486,8 @@ fun SearchScreen(hint: String, onSearch: (String) -> Unit) {
                 }) {
                     Text(
                         text = "Search",
-                        modifier = Modifier.semantics { testTag = "searchButton" })
+                        modifier = Modifier.semantics { testTag = "searchButton" }
+                    )
                 }
             }
             Column {
